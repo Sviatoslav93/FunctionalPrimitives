@@ -143,6 +143,7 @@ public class ResultTests
         }
 
         public string Email { get; set; } = null!;
+
         public string FullName { get; set; } = null!;
     }
 }

@@ -8,7 +8,9 @@ namespace Result;
 public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
 {
     private static readonly Unit InitialValue = default;
+
     public static ref readonly Unit Value => ref InitialValue;
+
     public static Result<Unit> Result => InitialValue.AsResult();
 
     public static Task<Unit> Task { get; } = System.Threading.Tasks.Task.FromResult(InitialValue);

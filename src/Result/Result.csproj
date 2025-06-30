@@ -14,13 +14,6 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <TargetFramework>net8.0</TargetFramework>
-
-    </PropertyGroup>
-
-    <PropertyGroup>
         <PackageId>Sviatoslav93.Result</PackageId>
         <Version>2.1.0</Version>
         <Authors>Sviatoslav Kindrat</Authors>

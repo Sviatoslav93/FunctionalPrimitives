@@ -2,6 +2,9 @@
 
 public partial class ResultExtensions
 {
+    /// <summary>
+    /// Executes a function if the result is successful, returning the original result.
+    /// </summary>
     public static async Task<Result<TNextValue>> ThenAsync<TValue, TNextValue>(
         this Result<TValue> result,
         Func<TValue,
