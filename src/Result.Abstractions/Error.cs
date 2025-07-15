@@ -1,4 +1,4 @@
-﻿namespace Result.Abstractions;
+namespace Result.Abstractions;
 
 public class Error(string message)
 {

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Result.Tests;
@@ -11,11 +11,11 @@ public class UnitTests
         var first = Unit.Value;
         var second = Unit.Value;
 
-        (first == second).Should().BeTrue();
-        (first != second).Should().BeFalse();
-        first.Equals(second).Should().BeTrue();
-        first.CompareTo(second).Should().Be(0);
-        first.Equals(new object()).Should().BeFalse();
+        (first == second).ShouldBeTrue();
+        (first != second).ShouldBeFalse();
+        first.Equals(second).ShouldBeTrue();
+        first.CompareTo(second).ShouldBe(0);
+        first.Equals(new object()).ShouldBeFalse();
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public class UnitTests
     {
         var nothing = Unit.Value;
         var toComparable = (IComparable)nothing;
-        toComparable.CompareTo(new object()).Should().Be(0);
+        toComparable.CompareTo(new object()).ShouldBe(0);
     }
 
     [Fact]
@@ -31,13 +31,13 @@ public class UnitTests
     {
         var task = Unit.Task;
         var nothing = await task;
-        nothing.Should().Be(Unit.Value);
+        nothing.ShouldBe(Unit.Value);
     }
 
     [Fact]
     public void ShouldBeOverridenToString()
     {
         var nothing = Unit.Value;
-        nothing.ToString().Should().Be("()");
+        nothing.ToString().ShouldBe("()");
     }
 }

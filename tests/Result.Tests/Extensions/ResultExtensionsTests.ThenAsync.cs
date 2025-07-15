@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
 using Result.Abstractions;
 using Result.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Result.Tests.Extensions;
@@ -20,11 +20,11 @@ public partial class ResultExtensionsTests
                 ? Task.FromResult(value)
                 : Task.FromResult(0));
 
-        result1.IsSuccess.Should().BeTrue();
-        result1.Value.Should().Be(1);
+        result1.IsSuccess.ShouldBeTrue();
+        result1.Value.ShouldBe(1);
 
-        result2.IsSuccess.Should().BeTrue();
-        result2.Value.Should().Be(1);
+        result2.IsSuccess.ShouldBeTrue();
+        result2.Value.ShouldBe(1);
     }
 
     [Fact]
@@ -50,17 +50,17 @@ public partial class ResultExtensionsTests
                 ? Task.FromResult(Result<int>.Success(value))
                 : Task.FromResult(Result<int>.Failed(new Error(ErrorMessage))));
 
-        resultSuccess1.IsSuccess.Should().BeTrue();
-        resultSuccess1.Value.Should().Be(1);
+        resultSuccess1.IsSuccess.ShouldBeTrue();
+        resultSuccess1.Value.ShouldBe(1);
 
-        resultFailed1.IsSuccess.Should().BeFalse();
-        resultFailed1.Errors.Should().HaveCount(1);
+        resultFailed1.IsSuccess.ShouldBeFalse();
+        resultFailed1.Errors.ShouldHaveSingleItem();
 
-        resultSuccess2.IsSuccess.Should().BeTrue();
-        resultSuccess2.Value.Should().Be(1);
+        resultSuccess2.IsSuccess.ShouldBeTrue();
+        resultSuccess2.Value.ShouldBe(1);
 
-        resultFailed2.IsSuccess.Should().BeFalse();
-        resultFailed2.Errors.Should().HaveCount(1);
+        resultFailed2.IsSuccess.ShouldBeFalse();
+        resultFailed2.Errors.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -71,8 +71,8 @@ public partial class ResultExtensionsTests
                 ? Task.FromResult(Result<int>.Success(value))
                 : Task.FromResult(Result<int>.Failed(new Error(ErrorMessage))));
 
-        resultFailed.IsSuccess.Should().BeFalse();
-        resultFailed.Errors.Should().HaveCount(1);
+        resultFailed.IsSuccess.ShouldBeFalse();
+        resultFailed.Errors.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -83,8 +83,8 @@ public partial class ResultExtensionsTests
                 ? value
                 : 0);
 
-        resultSuccess.IsSuccess.Should().BeTrue();
-        resultSuccess.Value.Should().Be(1);
+        resultSuccess.IsSuccess.ShouldBeTrue();
+        resultSuccess.Value.ShouldBe(1);
     }
 
     [Fact]
@@ -99,8 +99,8 @@ public partial class ResultExtensionsTests
                 : Result<int>.Failed(new Error("Division by zero")))
             .ThenAsync(x => x.ToString());
 
-        result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().HaveCount(1);
+        result.IsSuccess.ShouldBeFalse();
+        result.Errors.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public partial class ResultExtensionsTests
                 : Result<int>.Failed(new Error("Division by zero")))
             .ThenAsync(x => x.ToString());
 
-        result.IsSuccess.Should().BeTrue();
-        result.Errors.Should().HaveCount(0);
+        result.IsSuccess.ShouldBeTrue();
+        result.Errors.Count().ShouldBe(0);
     }
 }

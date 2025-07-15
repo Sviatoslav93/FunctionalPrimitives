@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
 using Result.Abstractions;
 using Result.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Result.Tests.Extensions;
@@ -16,8 +16,8 @@ public partial class ResultExtensionsTests
             .Then(x => int.TryParse(x, out var value) ? Result<int>.Success(value) : new Error(ErrorMessage))
             .Then(x => x + 1);
 
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(2);
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldBe(2);
     }
 
     [Fact]
@@ -27,7 +27,8 @@ public partial class ResultExtensionsTests
             .Then(x => int.TryParse($"{x}i", out var value) ? Result<int>.Success(value) : new Error(ErrorMessage))
             .Then(x => x + 1);
 
-        result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().HaveCount(1).And.ContainSingle(e => e.Message == ErrorMessage);
+        result.IsSuccess.ShouldBeFalse();
+        result.Errors.ShouldHaveSingleItem();
+        result.Errors.ShouldContain(e => e.Message == ErrorMessage);
     }
 }

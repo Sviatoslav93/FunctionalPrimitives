@@ -1,4 +1,4 @@
-﻿using Result.Abstractions;
+using Result.Abstractions;
 using Xunit;
 
 namespace Result.Tests;

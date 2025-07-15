@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Result.Abstractions;
+using Shouldly;
 using Xunit;
 
 namespace Result.Tests;
@@ -11,7 +11,7 @@ public class ResultTests
     {
         var result = Result<int>.Failed(new Error("test"));
 
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccess.ShouldBeFalse();
     }
 
     [Fact]
@@ -19,8 +19,8 @@ public class ResultTests
     {
         var result = Result<int>.Success(1);
 
-        result.Value.Should().Be(1);
-        result.IsSuccess.Should().BeTrue();
+        result.Value.ShouldBe(1);
+        result.IsSuccess.ShouldBeTrue();
     }
 
     [Fact]
@@ -28,8 +28,8 @@ public class ResultTests
     {
         var result = Result<int?>.Success(null);
 
-        result.Value.Should().BeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Value.ShouldBeNull();
+        result.IsSuccess.ShouldBeTrue();
     }
 
     [Fact]
@@ -40,8 +40,8 @@ public class ResultTests
             email: "test@gmail.com");
         var result = Result<TestUserDto>.Success(testDto);
 
-        result.Value.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Value.ShouldNotBeNull();
+        result.IsSuccess.ShouldBeTrue();
     }
 
     [Fact]
@@ -50,8 +50,8 @@ public class ResultTests
         var testDto = default(TestUserDto);
         var result = Result<TestUserDto?>.Success(testDto);
 
-        result.Value.Should().BeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.Value.ShouldBeNull();
+        result.IsSuccess.ShouldBeTrue();
     }
 
     [Fact]
@@ -59,8 +59,8 @@ public class ResultTests
     {
         var result = Result<int>.Failed(new Error("error one"), new Error("error two"));
 
-        result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().HaveCount(2);
+        result.IsSuccess.ShouldBeFalse();
+        result.Errors.Count().ShouldBe(2);
     }
 
     [Fact]
@@ -72,8 +72,8 @@ public class ResultTests
             new("error two"),
         });
 
-        result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().HaveCount(2);
+        result.IsSuccess.ShouldBeFalse();
+        result.Errors.Count().ShouldBe(2);
     }
 
     [Fact]
@@ -81,8 +81,8 @@ public class ResultTests
     {
         var (value, errors) = Result<int>.Failed(new Error("test"));
 
-        value.Should().Be(0);
-        errors.Should().HaveCount(1);
+        value.ShouldBe(0);
+        errors.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -90,12 +90,12 @@ public class ResultTests
     {
         var (value, errors) = Result<int>.Success(1);
 
-        value.Should().Be(1);
-        errors.Should().BeEmpty();
+        value.ShouldBe(1);
+        errors.ShouldBeEmpty();
 
         var (value2, errors2) = Result<int>.Failed(new Error("test"));
-        value2.Should().Be(0);
-        errors2.Should().HaveCount(1);
+        value2.ShouldBe(0);
+        errors2.ShouldHaveSingleItem();
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class ResultTests
     {
         var result = Result<int>.Success(1);
 
-        result.Value.Should().Be(1);
+        result.Value.ShouldBe(1);
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class ResultTests
     {
         Result<int> result = new Error("error");
 
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccess.ShouldBeFalse();
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class ResultTests
     {
         Result<int> result = new[] { new Error("err1"), new Error("err2"), new Error("err3") };
 
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccess.ShouldBeFalse();
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class ResultTests
     {
         Result<int> result = 1;
 
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccess.ShouldBeTrue();
     }
 
     private class TestUserDto

@@ -1,1 +1,1 @@
-﻿global using Error = Result.Abstractions.Error;
+global using Error = Result.Abstractions.Error;

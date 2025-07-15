@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
 using Result.Abstractions;
 using Result.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Result.Tests.Extensions;
@@ -15,17 +15,17 @@ public partial class ResultExtensionsTests
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(1);
+            .ShouldBe(1);
 
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
                 onFailure: _ => 0))
-            .Should().Be(1);
+            .ShouldBe(1);
 
         (await result.MatchAsync(
                 onSuccess: int.Parse,
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(1);
+            .ShouldBe(1);
     }
 
     [Fact]
@@ -36,17 +36,17 @@ public partial class ResultExtensionsTests
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(0);
+            .ShouldBe(0);
 
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
                 onFailure: _ => 0))
-            .Should().Be(0);
+            .ShouldBe(0);
 
         (await result.MatchAsync(
                 onSuccess: int.Parse,
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(0);
+            .ShouldBe(0);
     }
 
     [Fact]
@@ -57,22 +57,22 @@ public partial class ResultExtensionsTests
         (await result.MatchAsync(
                 onSuccess: int.Parse,
                 onFailure: _ => 0))
-            .Should().Be(1);
+            .ShouldBe(1);
 
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(1);
+            .ShouldBe(1);
 
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
                 onFailure: _ => 0))
-            .Should().Be(1);
+            .ShouldBe(1);
 
         (await result.MatchAsync(
                 onSuccess: int.Parse,
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(1);
+            .ShouldBe(1);
     }
 
     [Fact]
@@ -83,21 +83,21 @@ public partial class ResultExtensionsTests
         (await result.MatchAsync(
                 onSuccess: int.Parse,
                 onFailure: _ => 0))
-            .Should().Be(0);
+            .ShouldBe(0);
 
         (await result.MatchAsync(
                 onSuccess: v => Task.FromResult(int.Parse(v)),
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(0);
+            .ShouldBe(0);
 
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
                 onFailure: _ => 0))
-            .Should().Be(0);
+            .ShouldBe(0);
 
         (await result.MatchAsync(
                 onSuccess: int.Parse,
                 onFailure: _ => Task.FromResult(0)))
-            .Should().Be(0);
+            .ShouldBe(0);
     }
 }

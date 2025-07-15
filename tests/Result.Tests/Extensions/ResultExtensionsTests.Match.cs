@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
 using Result.Abstractions;
 using Result.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Result.Tests.Extensions;
@@ -16,7 +16,7 @@ public partial class ResultExtensionsTests
             x => x,
             _ => 0);
 
-        value.Should().Be(0);
+        value.ShouldBe(0);
     }
 
     [Fact]
@@ -28,6 +28,6 @@ public partial class ResultExtensionsTests
             x => x,
             _ => 0);
 
-        value.Should().Be(1);
+        value.ShouldBe(1);
     }
 }

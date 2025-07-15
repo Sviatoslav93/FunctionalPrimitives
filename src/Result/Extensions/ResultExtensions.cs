@@ -1,4 +1,4 @@
-﻿namespace Result.Extensions;
+namespace Result.Extensions;
 
 public static partial class ResultExtensions
 {
