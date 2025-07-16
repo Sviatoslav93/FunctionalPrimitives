@@ -7,7 +7,7 @@ public partial class ResultExtensions
     /// </summary>
     public static Result<T> Recover<T>(this Result<T> result, T fallbackValue)
     {
-        return result.IsSuccess ? result : Result<T>.Success(fallbackValue);
+        return result.IsSuccess ? result : Result.Success(fallbackValue);
     }
 
     /// <summary>
@@ -15,7 +15,7 @@ public partial class ResultExtensions
     /// </summary>
     public static Result<T> Recover<T>(this Result<T> result, Func<IEnumerable<Error>, T> recovery)
     {
-        return result.IsSuccess ? result : Result<T>.Success(recovery(result.Errors));
+        return result.IsSuccess ? result : Result.Success(recovery(result.Errors));
     }
 
     /// <summary>

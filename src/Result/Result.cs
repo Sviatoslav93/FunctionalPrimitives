@@ -62,20 +62,36 @@ public readonly struct Result<TValue> : IResult<TValue>
 
     public static implicit operator bool(Result<TValue> result) => result.IsSuccess;
 
+    public void Deconstruct(out TValue? value, out IEnumerable<Error> errors)
+    {
+        value = _value;
+        errors = Errors;
+    }
+
+    public override string ToString()
+    {
+        return IsSuccess
+            ? $"Success: {Value}"
+            : $"Failed: {string.Join(", ", Errors.Select(e => e.Message))}";
+    }
+}
+
+public static class Result
+{
     /// <summary>
     /// Creates a successful Result with the specified value.
     /// </summary>
-    public static Result<TValue> Success(TValue value) => new(value);
+    public static Result<TValue> Success<TValue>(TValue value) => value;
 
     /// <summary>
     /// Creates a failed Result with the specified error.
     /// </summary>
-    public static Result<TValue> Failed(params Error[] errors) => new(errors);
+    public static Result<TValue> Failed<TValue>(params Error[] errors) => errors;
 
     /// <summary>
     /// Creates a failed Result with the specified collection of errors.
     /// </summary>
-    public static Result<TValue> Failed(IEnumerable<Error> errors) => new(errors);
+    public static Result<TValue> Failed<TValue>(IEnumerable<Error> errors) => errors.ToArray();
 
     /// <summary>
     /// Executes a function and catches any exceptions, converting them to a failed Result.
@@ -84,12 +100,12 @@ public readonly struct Result<TValue> : IResult<TValue>
     {
         try
         {
-            return Result<T>.Success(func());
+            return Success(func());
         }
         catch (Exception ex)
         {
             var error = errorFactory?.Invoke(ex) ?? Error.Create("An error occurred during execution", ex);
-            return Result<T>.Failed(error);
+            return Failed<T>(error);
         }
     }
 
@@ -101,12 +117,12 @@ public readonly struct Result<TValue> : IResult<TValue>
         try
         {
             var result = await func().ConfigureAwait(false);
-            return Result<T>.Success(result);
+            return Success(result);
         }
         catch (Exception ex)
         {
             var error = errorFactory?.Invoke(ex) ?? Error.Create("An error occurred during execution", ex);
-            return Result<T>.Failed(error);
+            return Failed<T>(error);
         }
     }
 
@@ -122,7 +138,7 @@ public readonly struct Result<TValue> : IResult<TValue>
         catch (Exception ex)
         {
             var error = errorFactory?.Invoke(ex) ?? Error.Create("An error occurred during execution", ex);
-            return Result<T>.Failed(error);
+            return Failed<T>(error);
         }
     }
 
@@ -147,38 +163,7 @@ public readonly struct Result<TValue> : IResult<TValue>
         }
 
         return errors.Count > 0
-            ? Result<T[]>.Failed(errors)
-            : Result<T[]>.Success(values.ToArray());
+            ? Failed<T[]>(errors)
+            : Success(values.ToArray());
     }
-
-    public void Deconstruct(out TValue? value, out IEnumerable<Error> errors)
-    {
-        value = _value;
-        errors = Errors;
-    }
-
-    public override string ToString()
-    {
-        return IsSuccess
-            ? $"Success: {Value}"
-            : $"Failed: {string.Join(", ", Errors.Select(e => e.Message))}";
-    }
-}
-
-public static class Result
-{
-    /// <summary>
-    /// Creates a successful Result with the specified value.
-    /// </summary>
-    public static Result<TValue> Success<TValue>(TValue value) => Result<TValue>.Success(value);
-
-    /// <summary>
-    /// Creates a failed Result with the specified error.
-    /// </summary>
-    public static Result<TValue> Failed<TValue>(params Error[] errors) => Result<TValue>.Failed(errors);
-
-    /// <summary>
-    /// Creates a failed Result with the specified collection of errors.
-    /// </summary>
-    public static Result<TValue> Failed<TValue>(IEnumerable<Error> errors) => Result<TValue>.Failed(errors);
 }

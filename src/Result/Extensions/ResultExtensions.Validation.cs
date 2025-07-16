@@ -10,7 +10,7 @@ public static partial class ResultExtensions
         if (!result.IsSuccess)
             return result;
 
-        return predicate(result.Value) ? result : Result<T>.Failed(error);
+        return predicate(result.Value) ? result : Result.Failed<T>(error);
     }
 
     /// <summary>
@@ -21,7 +21,7 @@ public static partial class ResultExtensions
         if (!result.IsSuccess)
             return result;
 
-        return predicate(result.Value) ? result : Result<T>.Failed(errorFactory(result.Value));
+        return predicate(result.Value) ? result : Result.Failed<T>(errorFactory(result.Value));
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public static partial class ResultExtensions
             }
         }
 
-        return errors.Count > 0 ? Result<T>.Failed(errors) : result;
+        return errors.Count > 0 ? Result.Failed<T>(errors) : result;
     }
 
     /// <summary>
@@ -52,15 +52,15 @@ public static partial class ResultExtensions
     public static Result<T> EnsureNotNull<T>(this Result<T?> result, Error? error = null) where T : class
     {
         if (!result.IsSuccess)
-            return Result<T>.Failed(result.Errors);
+            return Result.Failed<T>(result.Errors);
 
         if (result.Value is null)
         {
             var errorToUse = error ?? Error.Create("Value cannot be null");
-            return Result<T>.Failed(errorToUse);
+            return Result.Failed<T>(errorToUse);
         }
 
-        return Result<T>.Success(result.Value);
+        return Result.Success(result.Value);
     }
 
     /// <summary>
@@ -69,15 +69,15 @@ public static partial class ResultExtensions
     public static Result<T> EnsureNotNull<T>(this Result<T?> result, Error? error = null) where T : struct
     {
         if (!result.IsSuccess)
-            return Result<T>.Failed(result.Errors);
+            return Result.Failed<T>(result.Errors);
 
         if (!result.Value.HasValue)
         {
             var errorToUse = error ?? Error.Create("Value cannot be null");
-            return Result<T>.Failed(errorToUse);
+            return Result.Failed<T>(errorToUse);
         }
 
-        return Result<T>.Success(result.Value.Value);
+        return Result.Success(result.Value.Value);
     }
 
     /// <summary>
@@ -86,15 +86,15 @@ public static partial class ResultExtensions
     public static Result<string> EnsureNotNullOrEmpty(this Result<string?> result, Error? error = null)
     {
         if (!result.IsSuccess)
-            return Result<string>.Failed(result.Errors);
+            return Result.Failed<string>(result.Errors);
 
         if (string.IsNullOrEmpty(result.Value))
         {
             var errorToUse = error ?? Error.Create("String cannot be null or empty");
-            return Result<string>.Failed(errorToUse);
+            return Result.Failed<string>(errorToUse);
         }
 
-        return Result<string>.Success(result.Value);
+        return Result.Success(result.Value);
     }
 
     /// <summary>
@@ -103,14 +103,14 @@ public static partial class ResultExtensions
     public static Result<string> EnsureNotNullOrWhiteSpace(this Result<string?> result, Error? error = null)
     {
         if (!result.IsSuccess)
-            return Result<string>.Failed(result.Errors);
+            return Result.Failed<string>(result.Errors);
 
         if (string.IsNullOrWhiteSpace(result.Value))
         {
             var errorToUse = error ?? Error.Create("String cannot be null, empty, or whitespace");
-            return Result<string>.Failed(errorToUse);
+            return Result.Failed<string>(errorToUse);
         }
 
-        return Result<string>.Success(result.Value);
+        return Result.Success(result.Value);
     }
 }

@@ -34,7 +34,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var result = Result<string>.Failed(error);
+        var result = Result.Failed<string>(error);
 
         // Act
         var actualResult = await result.TapAsync(async _ =>
@@ -56,7 +56,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var capturedValue = string.Empty;
         var expectedValue = "test value";
-        var result = Result<string>.Success(expectedValue);
+        var result = Result.Success(expectedValue);
 
         // Act
         await result.TapAsync(async value =>
@@ -74,7 +74,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var executed = false;
-        var task = Task.FromResult(Result<string>.Success("test"));
+        var task = Task.FromResult(Result.Success("test"));
 
         // Act
         var actualResult = await task.TapAsync(_ => executed = true);
@@ -91,7 +91,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var task = Task.FromResult(Result<string>.Failed(error));
+        var task = Task.FromResult(Result.Failed<string>(error));
 
         // Act
         var actualResult = await task.TapAsync(_ => executed = true);
@@ -107,7 +107,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var executed = false;
-        var task = Task.FromResult(Result<string>.Success("test"));
+        var task = Task.FromResult(Result.Success("test"));
 
         // Act
         var actualResult = await task.TapAsync(async _ =>
@@ -128,7 +128,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var task = Task.FromResult(Result<string>.Failed(error));
+        var task = Task.FromResult(Result.Failed<string>(error));
 
         // Act
         var actualResult = await task.TapAsync(async _ =>
@@ -147,7 +147,7 @@ public partial class ResultExtensionsTests
     public async Task TapAsync_ShouldMaintainResultIntegrity_When_ActionThrows()
     {
         // Arrange
-        var result = Result<string>.Success("test");
+        var result = Result.Success("test");
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -165,7 +165,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var person = new { Name = "John", Age = 30 };
-        var result = Result<object>.Success(person);
+        var result = Result.Success(person);
         var capturedPerson = default(object);
 
         // Act
@@ -186,7 +186,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var errors = new[] { new Error("error1"), new Error("error2") };
-        var result = Result<string>.Failed(errors);
+        var result = Result.Failed<string>(errors);
 
         // Act
         var actualResult = await result.TapAsync(async _ =>

@@ -9,7 +9,7 @@ public class ResultTests
     [Fact]
     public void Should_CreateFailedResult()
     {
-        var result = Result<int>.Failed(new Error("test"));
+        var result = Result.Failed<int>(new Error("test"));
 
         result.IsSuccess.ShouldBeFalse();
     }
@@ -17,7 +17,7 @@ public class ResultTests
     [Fact]
     public void Should_CreateSuccessResultForValueType()
     {
-        var result = Result<int>.Success(1);
+        var result = Result.Success(1);
 
         result.Value.ShouldBe(1);
         result.IsSuccess.ShouldBeTrue();
@@ -26,7 +26,7 @@ public class ResultTests
     [Fact]
     public void Should_CreateSuccessResultForNullableValueType()
     {
-        var result = Result<int?>.Success(null);
+        var result = Result.Success<int?>(null);
 
         result.Value.ShouldBeNull();
         result.IsSuccess.ShouldBeTrue();
@@ -38,7 +38,7 @@ public class ResultTests
         var testDto = new TestUserDto(
             fullName: "John Doe",
             email: "test@gmail.com");
-        var result = Result<TestUserDto>.Success(testDto);
+        var result = Result.Success(testDto);
 
         result.Value.ShouldNotBeNull();
         result.IsSuccess.ShouldBeTrue();
@@ -48,7 +48,7 @@ public class ResultTests
     public void Should_CreateSuccessResultForNullableReferenceType()
     {
         var testDto = default(TestUserDto);
-        var result = Result<TestUserDto?>.Success(testDto);
+        var result = Result.Success(testDto);
 
         result.Value.ShouldBeNull();
         result.IsSuccess.ShouldBeTrue();
@@ -57,7 +57,7 @@ public class ResultTests
     [Fact]
     public void Should_CreateFailedResultWithSeveralErrors()
     {
-        var result = Result<int>.Failed(new Error("error one"), new Error("error two"));
+        var result = Result.Failed<int>(new Error("error one"), new Error("error two"));
 
         result.IsSuccess.ShouldBeFalse();
         result.Errors.Count().ShouldBe(2);
@@ -66,7 +66,7 @@ public class ResultTests
     [Fact]
     public void Should_CreateFailedResultWithErrorsList()
     {
-        var result = Result<int>.Failed(new List<Error>
+        var result = Result.Failed<int>(new List<Error>
         {
             new("error one"),
             new("error two"),
@@ -79,7 +79,7 @@ public class ResultTests
     [Fact]
     public void Should_DeconstructFailedResult()
     {
-        var (value, errors) = Result<int>.Failed(new Error("test"));
+        var (value, errors) = Result.Failed<int>(new Error("test"));
 
         value.ShouldBe(0);
         errors.ShouldHaveSingleItem();
@@ -88,12 +88,12 @@ public class ResultTests
     [Fact]
     public void Should_DeconstructSuccessResult()
     {
-        var (value, errors) = Result<int>.Success(1);
+        var (value, errors) = Result.Success(1);
 
         value.ShouldBe(1);
         errors.ShouldBeEmpty();
 
-        var (value2, errors2) = Result<int>.Failed(new Error("test"));
+        var (value2, errors2) = Result.Failed<int>(new Error("test"));
         value2.ShouldBe(0);
         errors2.ShouldHaveSingleItem();
     }
@@ -101,7 +101,7 @@ public class ResultTests
     [Fact]
     public void Should_GetValue_When_ResultIsSuccess()
     {
-        var result = Result<int>.Success(1);
+        var result = Result.Success(1);
 
         result.Value.ShouldBe(1);
     }

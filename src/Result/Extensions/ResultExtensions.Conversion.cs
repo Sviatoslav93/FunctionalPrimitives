@@ -28,11 +28,11 @@ public static partial class ResultExtensions
     {
         if (nullable.HasValue)
         {
-            return Result<T>.Success(nullable.Value);
+            return Result.Success(nullable.Value);
         }
 
         var errorToUse = error ?? Error.Create("Value is null");
-        return Result<T>.Failed(errorToUse);
+        return Result.Failed<T>(errorToUse);
     }
 
     /// <summary>
@@ -43,11 +43,11 @@ public static partial class ResultExtensions
     {
         if (nullable is not null)
         {
-            return Result<T>.Success(nullable);
+            return Result.Success(nullable);
         }
 
         var errorToUse = error ?? Error.Create("Value is null");
-        return Result<T>.Failed(errorToUse);
+        return Result.Failed<T>(errorToUse);
     }
 
     /// <summary>

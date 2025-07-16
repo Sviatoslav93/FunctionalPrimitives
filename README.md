@@ -56,11 +56,11 @@ The `Result<T>` type represents either a successful value of type `T` or a colle
 
 ```csharp
 // Success
-Result<string> success = Result<string>.Success("Hello World");
+Result<string> success = Result.Success("Hello World");
 Result<string> implicit = "Hello World"; // Implicit conversion
 
 // Failure
-Result<string> failure = Result<string>.Failed(new Error("Something went wrong"));
+Result<string> failure = Result.Failed<string>(new Error("Something went wrong"));
 Result<string> implicitError = new Error("Something went wrong"); // Implicit conversion
 ```
 
@@ -293,7 +293,7 @@ Result<string> GetUserName() => "John Doe";
 Result<string> GetError() => new Error("User not found");
 
 // Avoid: Verbose
-Result<string> GetUserNameVerbose() => Result<string>.Success("John Doe");
+Result<string> GetUserNameVerbose() => Result.Success("John Doe");
 ```
 
 ### 2. Chain Operations for Readability

@@ -12,8 +12,8 @@ public partial class ResultExtensionsTests
     [Fact]
     public void Should_ReturnSuccessResult_When_AllThenPipeSuccess()
     {
-        var result = Result<string>.Success("1")
-            .Then(x => int.TryParse(x, out var value) ? Result<int>.Success(value) : new Error(ErrorMessage))
+        var result = Result.Success("1")
+            .Then(x => int.TryParse(x, out var value) ? Result.Success(value) : new Error(ErrorMessage))
             .Then(x => x + 1);
 
         result.IsSuccess.ShouldBeTrue();
@@ -23,8 +23,8 @@ public partial class ResultExtensionsTests
     [Fact]
     public void Should_ReturnFailedResult_When_AnyOfThenPipeIsFailed()
     {
-        var result = Result<string>.Success("1")
-            .Then(x => int.TryParse($"{x}i", out var value) ? Result<int>.Success(value) : new Error(ErrorMessage))
+        var result = Result.Success("1")
+            .Then(x => int.TryParse($"{x}i", out var value) ? Result.Success(value) : new Error(ErrorMessage))
             .Then(x => x + 1);
 
         result.IsSuccess.ShouldBeFalse();

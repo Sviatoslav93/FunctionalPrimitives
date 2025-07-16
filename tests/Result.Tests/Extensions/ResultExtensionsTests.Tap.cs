@@ -12,7 +12,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var value = 42;
-        var result = Result<int>.Success(value);
+        var result = Result.Success(value);
         var actionExecuted = false;
         int capturedValue = 0;
 
@@ -53,7 +53,7 @@ public partial class ResultExtensionsTests
             new Error("error one"),
             new Error("error two"),
         };
-        var result = Result<int>.Failed(errors);
+        var result = Result.Failed<int>(errors);
         var actionExecuted = false;
         IEnumerable<Error> capturedErrors = null!;
 
@@ -74,7 +74,7 @@ public partial class ResultExtensionsTests
     public void TapError_WhenResultIsSuccess_ShouldNotExecuteAction()
     {
         // Arrange
-        var result = Result<int>.Success(42);
+        var result = Result.Success(42);
         var actionExecuted = false;
 
         // Act
@@ -89,7 +89,7 @@ public partial class ResultExtensionsTests
     public void Tap_ShouldAllowMethodChaining()
     {
         // Arrange
-        var result = Result<int>.Success(42);
+        var result = Result.Success(42);
         var callOrder = new List<string>();
 
         // Act

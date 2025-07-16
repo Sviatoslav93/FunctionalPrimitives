@@ -1,3 +1,4 @@
+using Result.Abstractions;
 using Shouldly;
 using Xunit;
 
@@ -9,14 +10,47 @@ public partial class ResultExtensionsTests
     public void CombineTwoSuccessResults_ReturnsCombinedValue()
     {
         // Arrange
-        var result1 = Result<string>.Success("Hello");
-        var result2 = Result<string>.Success("World");
+        var result1 = Result.Success("Hello");
+        var result2 = Result.Success("World");
 
         // Act
-        var combinedResult = Result<string>.Combine(result1, result2);
+        var combinedResult = Result.Combine(result1, result2);
 
         // Assert
         combinedResult.IsSuccess.ShouldBeTrue();
         combinedResult.Value.ShouldBe(["Hello", "World"]);
+    }
+
+    [Fact]
+    public void CombineSuccessAndFailureResults_ReturnsFailure()
+    {
+        // Arrange
+        var result1 = Result.Success("Hello");
+        var result2 = Result.Failed<string>(new Error("Test Error"));
+
+        // Act
+        var combinedResult = Result.Combine(result1, result2);
+
+        // Assert
+        combinedResult.IsSuccess.ShouldBeFalse();
+        combinedResult.Errors.ShouldHaveSingleItem();
+        combinedResult.Errors.First().Message.ShouldBe("Test Error");
+    }
+
+    [Fact]
+    public void CombineTwoFailureResults_ReturnsCombinedErrors()
+    {
+        // Arrange
+        var result1 = Result.Failed<string>(new Error("Error 1"));
+        var result2 = Result.Failed<string>(new Error("Error 2"));
+
+        // Act
+        var combinedResult = Result.Combine(result1, result2);
+
+        // Assert
+        combinedResult.IsSuccess.ShouldBeFalse();
+        combinedResult.Errors.Length.ShouldBe(2);
+        combinedResult.Errors.Select(e => e.Message).ShouldContain("Error 1");
+        combinedResult.Errors.Select(e => e.Message).ShouldContain("Error 2");
     }
 }

@@ -10,7 +10,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public async Task Should_MatchSuccessAsync_From_Result()
     {
-        var result = Result<string>.Success("1");
+        var result = Result.Success("1");
 
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
@@ -31,7 +31,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public async Task Should_MatchFailedAsync_From_Result()
     {
-        var result = Result<string>.Failed(new Error("test"));
+        var result = Result.Failed<string>(new Error("test"));
 
         (await result.MatchAsync(
                 onSuccess: x => Task.FromResult(int.Parse(x)),
@@ -52,7 +52,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public async Task Should_MatchSuccessAsync_From_ResultTask()
     {
-        var result = Task.FromResult(Result<string>.Success("1"));
+        var result = Task.FromResult(Result.Success("1"));
 
         (await result.MatchAsync(
                 onSuccess: int.Parse,
@@ -78,7 +78,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public async Task Should_MatchFailedAsync_From_ResultTask()
     {
-        var result = Task.FromResult(Result<string>.Failed(new Error("test")));
+        var result = Task.FromResult(Result.Failed<string>(new Error("test")));
 
         (await result.MatchAsync(
                 onSuccess: int.Parse,

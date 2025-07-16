@@ -11,7 +11,7 @@ public partial class ResultExtensions
             return result;
 
         var recoveredValue = await recovery(result.Errors).ConfigureAwait(false);
-        return Result<T>.Success(recoveredValue);
+        return Result.Success(recoveredValue);
     }
 
     /// <summary>
