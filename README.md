@@ -32,7 +32,9 @@ using Result.Extensions;
 Result<int> Divide(int a, int b)
 {
     if (b == 0)
+    {
         return new Error("Division by zero");
+    }
 
     return a / b;
 }

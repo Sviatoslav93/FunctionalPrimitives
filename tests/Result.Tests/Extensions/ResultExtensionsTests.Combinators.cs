@@ -1,4 +1,5 @@
 using Result.Abstractions;
+using Result.Extensions;
 using Shouldly;
 using Xunit;
 
@@ -52,5 +53,24 @@ public partial class ResultExtensionsTests
         combinedResult.Errors.Length.ShouldBe(2);
         combinedResult.Errors.Select(e => e.Message).ShouldContain("Error 1");
         combinedResult.Errors.Select(e => e.Message).ShouldContain("Error 2");
+    }
+
+    [Fact]
+    public void CombineArrayOfSuccessResults_ReturnsCombinedSuccessResult()
+    {
+        var resultsArray = new[] { Result.Success("World"), Result.Success("!") };
+        var combinedResult = resultsArray.Combine();
+    }
+
+    [Fact]
+    public void CombineArrayOfResultsWithOneFailure_ReturnsCombinedFailureResult()
+    {
+        var resultsArray = new[] { Result.Success("World"), Result.Failed<string>(new Error("Test Error")) };
+        var combinedResult = resultsArray.Combine();
+
+        // Assert
+        combinedResult.IsSuccess.ShouldBeFalse();
+        combinedResult.Errors.ShouldHaveSingleItem();
+        combinedResult.Errors.First().Message.ShouldBe("Test Error");
     }
 }
