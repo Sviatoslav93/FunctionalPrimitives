@@ -1,5 +1,3 @@
-using Result.Abstractions;
-
 namespace Result;
 
 /// <summary>

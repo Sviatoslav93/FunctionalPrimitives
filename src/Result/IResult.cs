@@ -1,4 +1,4 @@
-namespace Result.Abstractions;
+namespace Result;
 
 public interface IResult
 {

@@ -1,5 +1,4 @@
 using System.Collections;
-using Result.Abstractions;
 
 namespace Result.Example;
 

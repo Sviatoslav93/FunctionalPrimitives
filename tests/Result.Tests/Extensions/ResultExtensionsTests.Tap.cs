@@ -1,4 +1,3 @@
-using Result.Abstractions;
 using Result.Extensions;
 using Shouldly;
 using Xunit;
