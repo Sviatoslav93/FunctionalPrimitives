@@ -52,7 +52,7 @@ public partial class ResultExtensionsTests
             new Error("error one"),
             new Error("error two"),
         };
-        var result = Result.Failed<int>(errors);
+        var result = Result.Failure<int>(errors);
         var actionExecuted = false;
         IEnumerable<Error> capturedErrors = null!;
 

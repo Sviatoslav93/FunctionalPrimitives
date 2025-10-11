@@ -17,7 +17,7 @@ Console.WriteLine(new string('-', 40));
 
 // Example #2 sync and failed
 var res2 = TestService.Divide(10, 2)
-    .Then(x => TestService.Divide(x, 0)) // stop execution here and return error
+    .Then(x => TestService.Divide(x, 0)) // stop execution here and return an error
     .Then(x => TestService.Divide(x, 2))
     .Then(x => Math.Round(x, 1))
     .Then(x => x.ToString(CultureInfo.InvariantCulture))

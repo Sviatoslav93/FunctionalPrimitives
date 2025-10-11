@@ -23,31 +23,23 @@ public static partial class ResultExtensions
     /// <summary>
     /// Converts a nullable value to a Result.
     /// </summary>
-    public static Result<T> ToResult<T>(this T? nullable, Error? error = null)
+    public static Result<T> ToResult<T>(this T? nullable, Error error)
         where T : struct
     {
-        if (nullable.HasValue)
-        {
-            return Result.Success(nullable.Value);
-        }
-
-        var errorToUse = error ?? Error.Create("Value is null");
-        return Result.Failed<T>(errorToUse);
+        return nullable.HasValue
+            ? Result.Success(nullable.Value)
+            : Result.Failure<T>(error);
     }
 
     /// <summary>
     /// Converts a nullable reference to a Result.
     /// </summary>
-    public static Result<T> ToResult<T>(this T? nullable, Error? error = null)
+    public static Result<T> ToResult<T>(this T? nullable, Error error)
         where T : class
     {
-        if (nullable is not null)
-        {
-            return Result.Success(nullable);
-        }
-
-        var errorToUse = error ?? Error.Create("Value is null");
-        return Result.Failed<T>(errorToUse);
+        return nullable is not null
+            ? Result.Success(nullable)
+            : Result.Failure<T>(error);
     }
 
     /// <summary>
@@ -55,37 +47,32 @@ public static partial class ResultExtensions
     /// </summary>
     public static T GetValueOrDefault<T>(this Result<T> result, T defaultValue = default!)
     {
-        return result.IsSuccess ? result.Value : defaultValue;
-    }
-
-    /// <summary>
-    /// Gets the value or returns the result of a factory function if the result is failed.
-    /// </summary>
-    public static T GetValueOrDefault<T>(this Result<T> result, Func<T> defaultFactory)
-    {
-        return result.IsSuccess ? result.Value : defaultFactory();
+        return result.Match(
+            x => x,
+            _ => defaultValue);
     }
 
     /// <summary>
     /// Gets the value or returns the result of a factory function that receives the errors.
     /// </summary>
-    public static T GetValueOrDefault<T>(this Result<T> result, Func<IEnumerable<Error>, T> defaultFactory)
+    public static T GetValueOrDefault<T>(this Result<T> result, Func<IEnumerable<Error>, T> factory)
     {
-        return result.IsSuccess ? result.Value : defaultFactory(result.Errors);
+        return result.Match(
+            x => x,
+            err => factory(err));
     }
 
     /// <summary>
     /// Throws an exception if the result is failed.
     /// </summary>
-    public static T GetValueOrThrow<T>(this Result<T> result, Func<IEnumerable<Error>, Exception>? exceptionFactory = null)
+    public static T GetValueOrThrow<T>(this Result<T> result, Func<IEnumerable<Error>, Exception> exceptionFactory)
     {
         if (result.IsSuccess)
         {
             return result.Value;
         }
 
-        var exception = exceptionFactory?.Invoke(result.Errors) ??
-                       new InvalidOperationException($"Result failed with errors: {string.Join(", ", result.Errors.Select(e => e.Message))}");
+        var exception = exceptionFactory.Invoke(result.Errors);
         throw exception;
     }
 }

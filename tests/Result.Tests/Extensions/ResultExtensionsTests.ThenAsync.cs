@@ -30,24 +30,24 @@ public partial class ResultExtensionsTests
     public async Task ThenAsync_ShouldReturnSuccessResult_When_OnSuccessIsSuccessWithTaskResultNextValue()
     {
         var resultSuccess1 = await Result.Success("1")
-            .ThenAsync(x => int.TryParse(x, out var value)
+            .ThenAsync(static x => int.TryParse(x, out var value)
                 ? Task.FromResult(Result.Success(value))
-                : Task.FromResult(Result.Failed<int>(new Error(ErrorMessage))));
+                : Task.FromResult(Result.Failure<int>(new Error(ErrorMessage))));
 
         var resultSuccess2 = await Task.FromResult(Result.Success("1"))
             .ThenAsync(x => int.TryParse(x, out var value)
                 ? Task.FromResult(Result.Success(value))
-                : Task.FromResult(Result.Failed<int>()));
+                : Task.FromResult(Result.Failure<int>(new Error(ErrorMessage))));
 
         var resultFailed1 = await Result.Success("1i")
             .ThenAsync(x => int.TryParse(x, out var value)
                 ? Task.FromResult(Result.Success(value))
-                : Task.FromResult(Result.Failed<int>(new Error(ErrorMessage))));
+                : Task.FromResult(Result.Failure<int>(new Error(ErrorMessage))));
 
         var resultFailed2 = await Task.FromResult(Result.Success("1i"))
             .ThenAsync(x => int.TryParse(x, out var value)
                 ? Task.FromResult(Result.Success(value))
-                : Task.FromResult(Result.Failed<int>(new Error(ErrorMessage))));
+                : Task.FromResult(Result.Failure<int>(new Error(ErrorMessage))));
 
         resultSuccess1.IsSuccess.ShouldBeTrue();
         resultSuccess1.Value.ShouldBe(1);
@@ -68,7 +68,7 @@ public partial class ResultExtensionsTests
         var resultFailed = await Result.Success("1i")
             .ThenAsync(x => int.TryParse(x, out var value)
                 ? Task.FromResult(Result.Success(value))
-                : Task.FromResult(Result.Failed<int>(new Error(ErrorMessage))));
+                : Task.FromResult(Result.Failure<int>(new Error(ErrorMessage))));
 
         resultFailed.IsSuccess.ShouldBeFalse();
         resultFailed.Errors.ShouldHaveSingleItem();
@@ -95,7 +95,7 @@ public partial class ResultExtensionsTests
                 : Task.FromResult(0))
             .ThenAsync(x => x != 0
                 ? Result.Success(10 / x)
-                : Result.Failed<int>(new Error("Division by zero")))
+                : Result.Failure<int>(new Error("Division by zero")))
             .ThenAsync(x => x.ToString());
 
         result.IsSuccess.ShouldBeFalse();
@@ -111,7 +111,7 @@ public partial class ResultExtensionsTests
                 : Task.FromResult(0))
             .ThenAsync(x => x != 0
                 ? Result.Success(10 / x)
-                : Result.Failed<int>(new Error("Division by zero")))
+                : Result.Failure<int>(new Error("Division by zero")))
             .ThenAsync(x => x.ToString());
 
         result.IsSuccess.ShouldBeTrue();

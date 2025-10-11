@@ -3,26 +3,28 @@ namespace Result.Extensions;
 public partial class ResultExtensions
 {
     /// <summary>
-    /// Tries to recover from a failed result by providing a fallback value.
+    /// Try to recover from a failed result by providing a fallback value.
     /// </summary>
-    public static Result<T> Recover<T>(this Result<T> result, T fallbackValue)
+    /// <returns> fallback value. </returns>
+    public static Result<T> Recover<T>(
+        this Result<T> result,
+        T fallbackValue)
     {
-        return result.IsSuccess ? result : Result.Success(fallbackValue);
+        return result.Match(
+            x => x,
+            _ => Result.Success(fallbackValue));
     }
 
     /// <summary>
-    /// Tries to recover from a failed result by executing a recovery function.
+    /// Try to recover from a failed result by executing a recovery function.
     /// </summary>
-    public static Result<T> Recover<T>(this Result<T> result, Func<IEnumerable<Error>, T> recovery)
+    /// <returns> fallback value from the recovery factory. </returns>
+    public static Result<T> Recover<T>(
+        this Result<T> result,
+        Func<IEnumerable<Error>, T> recoveryFactory)
     {
-        return result.IsSuccess ? result : Result.Success(recovery(result.Errors));
-    }
-
-    /// <summary>
-    /// Tries to recover from a failed result by executing a recovery function that returns a Result.
-    /// </summary>
-    public static Result<T> Recover<T>(this Result<T> result, Func<IEnumerable<Error>, Result<T>> recovery)
-    {
-        return result.IsSuccess ? result : recovery(result.Errors);
+        return result.Match(
+            x => x,
+            err => Result.Success(recoveryFactory(err)));
     }
 }

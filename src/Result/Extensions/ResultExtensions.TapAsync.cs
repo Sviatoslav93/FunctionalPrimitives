@@ -5,19 +5,24 @@ public partial class ResultExtensions
     /// <summary>
     /// Executes an async action if the result is successful, returning the original result.
     /// </summary>
-    public static async Task<Result<T>> TapAsync<T>(this Result<T> result, Func<T, Task> action)
+    public static Task<Result<T>> TapAsync<T>(
+        this Result<T> result,
+        Func<T, Task> action)
     {
-        if (result.IsSuccess)
+        return result.ThenAsync(async x =>
         {
-            await action(result.Value).ConfigureAwait(false);
-        }
-        return result;
+            await action(x).ConfigureAwait(false);
+
+            return x;
+        });
     }
 
     /// <summary>
     /// Executes an async action if the result is successful, returning the original result.
     /// </summary>
-    public static async Task<Result<T>> TapAsync<T>(this Task<Result<T>> task, Action<T> action)
+    public static async Task<Result<T>> TapAsync<T>(
+        this Task<Result<T>> task,
+        Action<T> action)
     {
         var result = await task.ConfigureAwait(false);
         return result.Tap(action);

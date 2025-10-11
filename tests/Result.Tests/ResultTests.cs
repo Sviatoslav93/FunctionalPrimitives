@@ -3,146 +3,54 @@ using Xunit;
 
 namespace Result.Tests;
 
-public class ResultTests
+public partial class ResultTests
 {
+    [Fact]
+    public void Should_CreateSuccessResult()
+    {
+        var result = Result.Success();
+
+        result.IsSuccess.ShouldBeTrue();
+    }
+
     [Fact]
     public void Should_CreateFailedResult()
     {
-        var result = Result.Failed<int>(new Error("test"));
+        var result1 = Result.Failure(new Error("test"));
+        var result2 = Result.Failure(new List<Error> { new("test") });
+        var result3 = Result.Failure(new Error("test"), new Error("test2"));
 
-        result.IsSuccess.ShouldBeFalse();
+        result1.IsSuccess.ShouldBeFalse();
+        result2.IsSuccess.ShouldBeFalse();
+        result3.IsSuccess.ShouldBeFalse();
     }
 
     [Fact]
-    public void Should_CreateSuccessResultForValueType()
+    public void Should_ReturnSuccesResult_When_TryActionIsSuccess()
     {
-        var result = Result.Success(1);
-
-        result.Value.ShouldBe(1);
-        result.IsSuccess.ShouldBeTrue();
-    }
-
-    [Fact]
-    public void Should_CreateSuccessResultForNullableValueType()
-    {
-        var result = Result.Success<int?>(null);
-
-        result.Value.ShouldBeNull();
-        result.IsSuccess.ShouldBeTrue();
-    }
-
-    [Fact]
-    public void Should_CreateSuccessResultForReferenceType()
-    {
-        var testDto = new TestUserDto(
-            fullName: "John Doe",
-            email: "test@gmail.com");
-        var result = Result.Success(testDto);
-
-        result.Value.ShouldNotBeNull();
-        result.IsSuccess.ShouldBeTrue();
-    }
-
-    [Fact]
-    public void Should_CreateSuccessResultForNullableReferenceType()
-    {
-        var testDto = default(TestUserDto);
-        var result = Result.Success(testDto);
-
-        result.Value.ShouldBeNull();
-        result.IsSuccess.ShouldBeTrue();
-    }
-
-    [Fact]
-    public void Should_CreateFailedResultWithSeveralErrors()
-    {
-        var result = Result.Failed<int>(new Error("error one"), new Error("error two"));
-
-        result.IsSuccess.ShouldBeFalse();
-        result.Errors.Count().ShouldBe(2);
-    }
-
-    [Fact]
-    public void Should_CreateFailedResultWithErrorsList()
-    {
-        var result = Result.Failed<int>(new List<Error>
+        static void Act()
         {
-            new("error one"),
-            new("error two"),
-        });
-
-        result.IsSuccess.ShouldBeFalse();
-        result.Errors.Count().ShouldBe(2);
-    }
-
-    [Fact]
-    public void Should_DeconstructFailedResult()
-    {
-        var (value, errors) = Result.Failed<int>(new Error("test"));
-
-        value.ShouldBe(0);
-        errors.ShouldHaveSingleItem();
-    }
-
-    [Fact]
-    public void Should_DeconstructSuccessResult()
-    {
-        var (value, errors) = Result.Success(1);
-
-        value.ShouldBe(1);
-        errors.ShouldBeEmpty();
-
-        var (value2, errors2) = Result.Failed<int>(new Error("test"));
-        value2.ShouldBe(0);
-        errors2.ShouldHaveSingleItem();
-    }
-
-    [Fact]
-    public void Should_GetValue_When_ResultIsSuccess()
-    {
-        var result = Result.Success(1);
-
-        result.Value.ShouldBe(1);
-    }
-
-    [Fact]
-    public void Should_ImplicitConvertErrorToResult()
-    {
-        Result<int> result = new Error("error");
-
-        result.IsSuccess.ShouldBeFalse();
-    }
-
-    [Fact]
-    public void Should_ImplicitConvertArrayOfErrorToResult()
-    {
-        Result<int> result = new[] { new Error("err1"), new Error("err2"), new Error("err3") };
-
-        result.IsSuccess.ShouldBeFalse();
-    }
-
-    [Fact]
-    public void Should_ImplicitConvertValueToResult()
-    {
-        Result<int> result = 1;
-
-        result.IsSuccess.ShouldBeTrue();
-    }
-
-    private class TestUserDto
-    {
-        public TestUserDto()
-        {
+            // do nothing =)
         }
 
-        public TestUserDto(string fullName, string email)
+        var res = Result.Try(Act, ex => new Error(ex.Message));
+
+        res.IsSuccess.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Should_ReturnFailedResult_When_TryActionIsFailed()
+    {
+        var msg = "exceprion";
+
+        void Act()
         {
-            FullName = fullName;
-            Email = email;
+            throw new Exception(msg);
         }
 
-        public string Email { get; set; } = null!;
+        var res = Result.Try(Act, ex => new Error(ex.Message));
 
-        public string FullName { get; set; } = null!;
+        res.IsSuccess.ShouldBeTrue();
+        res.Errors[0].Message.ShouldBe<string>(msg);
     }
 }

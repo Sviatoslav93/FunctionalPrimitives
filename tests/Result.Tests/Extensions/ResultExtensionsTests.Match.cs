@@ -9,7 +9,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public void Should_MatchFailedResult()
     {
-        var result = Result.Failed<int>(new Error("test"));
+        var result = Result.Failure<int>(new Error("test"));
 
         var value = result.Match(
             x => x,

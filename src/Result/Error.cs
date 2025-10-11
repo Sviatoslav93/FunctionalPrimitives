@@ -1,36 +1,24 @@
+using System.Runtime.CompilerServices;
+
 namespace Result;
 
-public class Error(string message)
+/// <summary>
+/// Result error.
+/// </summary>
+public class Error(
+    string message,
+    string code = "",
+    [CallerMemberName] string memberName = "not-defined",
+    [CallerFilePath] string sourceFilePath = "not-defined",
+    [CallerLineNumber] int sourceLineNumber = 0)
 {
     public string Message { get; } = message;
 
-    public string? Code { get; init; }
+    public string Code { get; } = code;
 
-    public Exception? Exception { get; init; }
+    public string MemberName { get; } = memberName;
 
-    public Dictionary<string, object>? Metadata { get; init; }
+    public string SourceFilePath { get; } = sourceFilePath;
 
-    public static Error Create(string message) => new(message);
-
-    public static Error Create(string message, string code) => new(message) { Code = code };
-
-    public static Error Create(string message, Exception exception) => new(message) { Exception = exception };
-
-    public static Error Create(string message, string code, Exception exception) => new(message) { Code = code, Exception = exception };
-
-    public Error WithCode(string code) => new(Message) { Code = code, Exception = Exception, Metadata = Metadata };
-
-    public Error WithException(Exception exception) => new(Message) { Code = Code, Exception = exception, Metadata = Metadata };
-
-    public Error WithMetadata(string key, object value)
-    {
-        var metadata = Metadata?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) ?? new Dictionary<string, object>();
-        metadata[key] = value;
-        return new(Message) { Code = Code, Exception = Exception, Metadata = metadata };
-    }
-
-    public override string ToString()
-    {
-        return Message;
-    }
+    public int SourceLineNumber { get; } = sourceLineNumber;
 }

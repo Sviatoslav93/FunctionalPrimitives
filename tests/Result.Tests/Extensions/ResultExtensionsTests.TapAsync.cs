@@ -33,7 +33,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var result = Result.Failed<string>(error);
+        var result = Result.Failure<string>(error);
 
         // Act
         var actualResult = await result.TapAsync(async _ =>
@@ -90,7 +90,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var task = Task.FromResult(Result.Failed<string>(error));
+        var task = Task.FromResult(Result.Failure<string>(error));
 
         // Act
         var actualResult = await task.TapAsync(_ => executed = true);
@@ -127,7 +127,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var task = Task.FromResult(Result.Failed<string>(error));
+        var task = Task.FromResult(Result.Failure<string>(error));
 
         // Act
         var actualResult = await task.TapAsync(async _ =>
@@ -185,7 +185,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var errors = new[] { new Error("error1"), new Error("error2") };
-        var result = Result.Failed<string>(errors);
+        var result = Result.Failure<string>(errors);
 
         // Act
         var actualResult = await result.TapAsync(async _ =>

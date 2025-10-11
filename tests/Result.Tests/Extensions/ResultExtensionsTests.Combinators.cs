@@ -26,7 +26,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var result1 = Result.Success("Hello");
-        var result2 = Result.Failed<string>(new Error("Test Error"));
+        var result2 = Result.Failure<string>(new Error("Test Error"));
 
         // Act
         var combinedResult = Result.Combine(result1, result2);
@@ -41,8 +41,8 @@ public partial class ResultExtensionsTests
     public void CombineTwoFailureResults_ReturnsCombinedErrors()
     {
         // Arrange
-        var result1 = Result.Failed<string>(new Error("Error 1"));
-        var result2 = Result.Failed<string>(new Error("Error 2"));
+        var result1 = Result.Failure<string>(new Error("Error 1"));
+        var result2 = Result.Failure<string>(new Error("Error 2"));
 
         // Act
         var combinedResult = Result.Combine(result1, result2);
@@ -64,7 +64,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public void CombineArrayOfResultsWithOneFailure_ReturnsCombinedFailureResult()
     {
-        var resultsArray = new[] { Result.Success("World"), Result.Failed<string>(new Error("Test Error")) };
+        var resultsArray = new[] { Result.Success("World"), Result.Failure<string>(new Error("Test Error")) };
         var combinedResult = resultsArray.Combine();
 
         // Assert
