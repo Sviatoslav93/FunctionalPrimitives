@@ -3,9 +3,23 @@ namespace Result.Extensions;
 public partial class ResultExtensions
 {
     /// <summary>
-    /// Tries to recover from a failed result by executing an async recovery function.
+    /// Attempts to recover from a failure result by asynchronously invoking a recovery function
+    /// and returning a new result based on the recovered value.
     /// </summary>
-    public static async Task<Result<T>> RecoverAsync<T>(this Result<T> result, Func<IEnumerable<Error>, Task<T>> recovery)
+    /// <typeparam name="T">The type of the value contained in the result.</typeparam>
+    /// <param name="result">The initial result that may represent a success or failure state.</param>
+    /// <param name="recovery">
+    /// A function that will asynchronously process the collection of errors from the failure result
+    /// and provide a recovery value of type <typeparamref name="T"/>.
+    /// </param>
+    /// <returns>
+    /// A new result of type <typeparamref name="T"/>.
+    /// If the original result is a success, the same result is returned.
+    /// If the original result is a failure, a new result containing the recovery value is returned.
+    /// </returns>
+    public static async Task<Result<T>> RecoverAsync<T>(
+        this Result<T> result,
+        Func<IEnumerable<Error>, Task<T>> recovery)
     {
         if (result.IsSuccess)
             return result;
@@ -15,8 +29,20 @@ public partial class ResultExtensions
     }
 
     /// <summary>
-    /// Tries to recover from a failed result by executing an async recovery function that returns a Result.
+    /// Attempts to recover from a failure result by asynchronously invoking a recovery function
+    /// that returns a new result.
     /// </summary>
+    /// <typeparam name="T">The type of the value contained in the result.</typeparam>
+    /// <param name="result">The initial result that may represent a success or failure state.</param>
+    /// <param name="recovery">
+    /// A function that will asynchronously process the collection of errors from the failure result
+    /// and provide a new result of type <typeparamref name="T"/>.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation that yields a result of type <typeparamref name="T"/>.
+    /// If the original result is a success, the same result is returned.
+    /// If the original result is a failure, the result returned by the recovery function is returned.
+    /// </returns>
     public static Task<Result<T>> RecoverAsync<T>(
         this Result<T> result,
         Func<IEnumerable<Error>, Task<Result<T>>> recovery)
@@ -27,8 +53,20 @@ public partial class ResultExtensions
     }
 
     /// <summary>
-    /// Tries to recover from a failed task result by executing an async recovery function.
+    /// Attempts to recover from a failure result by asynchronously invoking a recovery function
+    /// that returns a new result. This overload accepts a task that produces the result.
     /// </summary>
+    /// <typeparam name="T">The type of the value contained in the result.</typeparam>
+    /// <param name="task">A task representing the asynchronous operation that produces the initial result.</param>
+    /// <param name="recovery">
+    /// A function that will asynchronously process the collection of errors from the failure result
+    /// and provide a new result of type <typeparamref name="T"/>.
+    /// </param>
+    /// <returns>
+    /// A task representing the asynchronous operation that yields a result of type <typeparamref name="T"/>.
+    /// If the original result is a success, the same result is returned.
+    /// If the original result is a failure, the result returned by the recovery function is returned.
+    /// </returns>
     public static Task<Result<T>> RecoverAsync<T>(
         this Task<Result<T>> task,
         Func<IEnumerable<Error>, Task<Result<T>>> recovery)
@@ -36,5 +74,26 @@ public partial class ResultExtensions
         return task.MatchAsync(
             x => x,
             recovery);
+    }
+
+    /// <summary>
+    /// Attempts to recover from a failure result by providing a fallback value.
+    /// This overload accepts a task that produces the result.
+    /// </summary>
+    /// <typeparam name="T">The type of the value contained in the result.</typeparam>
+    /// <param name="task">A task representing the asynchronous operation that produces the initial result.</param>
+    /// <param name="fallback">The fallback value to use if the result is a failure.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation that yields a result of type <typeparamref name="T"/>.
+    /// If the original result is a success, the same result is returned.
+    /// If the original result is a failure, a new success result containing the fallback value is returned.
+    /// </returns>
+    public static async Task<Result<T>> RecoverAsync<T>(
+        this Task<Result<T>> task,
+        T fallback)
+    {
+        var result = await task.ConfigureAwait(false);
+
+        return result.Recover(fallback);
     }
 }

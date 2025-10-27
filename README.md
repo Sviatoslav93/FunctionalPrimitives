@@ -189,18 +189,18 @@ var customResult = ResultExtensions.Try(
     ex => Error.Create($"Operation failed: {ex.Message}", "RISKY_OP_FAILED", ex));
 ```
 
-### Working with Unit Type
+### Working with None Type
 
 For operations that don't return values:
 
 ```csharp
-// Use Unit for void operations
-Result<Unit> SaveData(string data)
+// Use None for void operations
+Result<None> SaveData(string data)
 {
     try
     {
         File.WriteAllText("data.txt", data);
-        return Unit.Value;
+        return None.Value;
     }
     catch (Exception ex)
     {

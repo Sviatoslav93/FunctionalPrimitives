@@ -1,24 +1,13 @@
 using System.Runtime.CompilerServices;
 
 namespace Result;
-
 /// <summary>
-/// Result error.
+/// Represents an error with contextual information such as a message, code,
+/// caller member name, source file path, and source line number.
 /// </summary>
-public class Error(
-    string message,
-    string code = "",
-    [CallerMemberName] string memberName = "not-defined",
-    [CallerFilePath] string sourceFilePath = "not-defined",
-    [CallerLineNumber] int sourceLineNumber = 0)
-{
-    public string Message { get; } = message;
-
-    public string Code { get; } = code;
-
-    public string MemberName { get; } = memberName;
-
-    public string SourceFilePath { get; } = sourceFilePath;
-
-    public int SourceLineNumber { get; } = sourceLineNumber;
-}
+public record Error(
+    string Message,
+    string Code = "",
+    [CallerMemberName] string MemberName = "not-defined",
+    [CallerFilePath] string SourceFilePath = "not-defined",
+    [CallerLineNumber] int SourceLineNumber = 0);
