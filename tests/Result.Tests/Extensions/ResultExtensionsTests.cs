@@ -12,7 +12,7 @@ public partial class ResultExtensionsTests
         var value = 42;
 
         // Act
-        var result = value.AsResult();
+        var result = value.AsResult;
 
         // Assert
         Assert.True(result.IsSuccess);

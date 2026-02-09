@@ -3,39 +3,41 @@ namespace Result.Extensions;
 public static partial class ResultExtensions
 {
     /// <summary>
-    /// Combines multiple <see cref="Result{T}"/> objects into a single result.
-    /// If all the results are successful, the combined result will also be successful,
-    /// containing an array of all successful values. If any result fails, the combined
-    /// result will be a failure and will aggregate all errors.
+    /// Provides extension methods for working with <see cref="Result{T}"/> objects.
     /// </summary>
-    /// <typeparam name="T">The type of the values contained in the results.</typeparam>
-    /// <param name="results">An enumerable collection of <see cref="Result{T}"/> objects to be combined.</param>
-    /// <returns>
-    /// A Result containing an array of all successful values where:
-    /// - If all input results are successful, the result will be successful and contain an array of their values.
-    /// - If any input result is a failure, the result will be a failure and will aggregate all the errors.
-    /// </returns>
-    public static Result<T[]> Combine<T>(this IEnumerable<Result<T>> results)
+    extension<TValue>(IEnumerable<Result<TValue>> results)
     {
-        var resultArray = results.ToArray();
-        var errors = new List<Error>();
-        var values = new List<T>();
-
-        foreach (var result in resultArray)
+        /// <summary>
+        /// Combines multiple <see cref="Result{TValue}"/> objects into a single result.
+        /// If all results are successful, the combined result will contain an array of their values as a successful result.
+        /// If any result is a failure, the combined result will be a failure and will aggregate all encountered errors.
+        /// </summary>
+        /// <returns>
+        /// - If all input results are successful, it will be successful and contain an array of their values.
+        /// - If any input result is a failure, it will be a failure containing all the aggregated errors.
+        /// </returns>
+        public Result<TValue[]> Combine()
         {
-            if (result.IsSuccess)
-            {
-                values.Add(result.Value);
-            }
-            else
-            {
-                errors.AddRange(result.Errors);
-            }
-        }
+            var resultArray = results.ToArray();
+            var errors = new List<Error>();
+            var values = new List<TValue>();
 
-        return errors.Count > 0
-            ? Result.Failure<T[]>(errors)
-            : Result.Success(values.ToArray());
+            foreach (var result in resultArray)
+            {
+                if (result.IsSuccess)
+                {
+                    values.Add(result.Value);
+                }
+                else
+                {
+                    errors.AddRange(result.Errors);
+                }
+            }
+
+            return errors.Count > 0
+                ? Result.Failure<TValue[]>(errors)
+                : Result.Success(values.ToArray());
+        }
     }
 
     /// <summary>
@@ -55,6 +57,7 @@ public static partial class ResultExtensions
         this Result<T> result,
         params Result<T>[] results)
     {
+        // todo: fix with extension c#14 syntax, currently it leads to build errors
         List<Result<T>> arr = [result, .. results];
 
         return arr.Combine();
