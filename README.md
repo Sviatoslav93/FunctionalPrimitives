@@ -9,7 +9,7 @@ A robust, functional approach to error handling in C#. The Result pattern is an 
 ## Features
 
 - 🚀 **Zero exceptions** - Explicit error handling without throwing exceptions
-- 🔗 **Fluent chaining** - Chain operations with `Then`, `ThenAsync`, and more
+- 🔗 **Fluent chaining** - Chain operations with `Bind`, `BindAsync`, and more
 - 🎯 **Type safe** - Compile-time safety for error handling
 - ⚡ **High performance** - No exception overhead
 - 🧪 **Composable** - Combine, validate, and transform results easily
@@ -41,13 +41,13 @@ Result<int> Divide(int a, int b)
 
 // Chain operations
 var result = Divide(10, 2)
-    .Then(x => x * 2)
-    .Then(x => x.ToString())
+    .Bind(x => x * 2)
+    .Bind(x => x.ToString())
     .Match(
         onSuccess: value => $"Result: {value}",
         onFailure: errors => $"Error: {string.Join(", ", errors)}");
 
-Console.WriteLine(result); // "Result: 10"
+Console.WriteLine(result); // Output: Result: 10
 ```
 
 ## Core Concepts
@@ -62,28 +62,23 @@ Result<string> success = Result.Success("Hello World");
 Result<string> implicit = "Hello World"; // Implicit conversion
 
 // Failure
-Result<string> failure = Result.Failed<string>(new Error("Something went wrong"));
+Result<string> failure = Result.Failure<string>(new Error("Something went wrong"));
 Result<string> implicitError = new Error("Something went wrong"); // Implicit conversion
 ```
 
-### Error Types
+### Error
 
-Create rich error information:
+The `Error` record represents an error with contextual information:
 
 ```csharp
 // Simple error
 var error = new Error("Invalid input");
 
 // Error with code
-var codedError = Error.Create("Invalid email format", "EMAIL_INVALID");
+var codedError = new Error("Invalid email format", "EMAIL_INVALID");
 
-// Error with exception
-var exceptionError = Error.Create("Database error", ex);
-
-// Error with metadata
-var richError = Error.Create("Validation failed", "VALIDATION_ERROR")
-    .WithMetadata("field", "email")
-    .WithMetadata("value", "invalid-email");
+// Error with exception can be created in the Try method
+var result = Result.Try(() => int.Parse("invalid"), ex => new Error(ex.Message));
 ```
 
 ## Usage Examples
@@ -116,14 +111,14 @@ var message = result.Match(
 ```csharp
 // Synchronous chaining
 var result = ParseInt("123")
-    .Then(x => x * 2)
-    .Then(x => x > 100 ? x : throw new InvalidOperationException())
-    .Then(x => x.ToString());
+    .Bind(x => x * 2)
+    .Bind(x => x > 100 ? x : new Error("Value too small"))
+    .Bind(x => x.ToString());
 
 // Async chaining
 var asyncResult = await GetUserAsync(userId)
-    .ThenAsync(user => GetProfileAsync(user.Id))
-    .ThenAsync(profile => UpdateLastAccessAsync(profile))
+    .BindAsync(user => GetProfileAsync(user.Id))
+    .BindAsync(profile => UpdateLastAccessAsync(profile))
     .MatchAsync(
         onSuccess: profile => $"Updated: {profile.Name}",
         onFailure: errors => $"Failed: {string.Join(", ", errors)}");
@@ -135,19 +130,23 @@ var asyncResult = await GetUserAsync(userId)
 // Validation pipeline
 Result<string> ValidateEmail(string email)
 {
-    return email.ToResult()
-        .EnsureNotNullOrWhiteSpace(Error.Create("Email is required"))
-        .Ensure(x => x.Contains("@"), Error.Create("Invalid email format"))
-        .Ensure(x => x.Length <= 100, Error.Create("Email too long"));
+    if (string.IsNullOrWhiteSpace(email))
+        return new Error("Email is required");
+
+    if (!email.Contains("@"))
+        return new Error("Invalid email format");
+
+    if (email.Length > 100)
+        return new Error("Email too long");
+
+    return email;
 }
 
-// Multiple validations
-var userResult = CreateUser(name, email, age)
-    .EnsureAll(
-        (user => !string.IsNullOrEmpty(user.Name), Error.Create("Name required")),
-        (user => user.Age >= 18, Error.Create("Must be 18 or older")),
-        (user => IsValidEmail(user.Email), Error.Create("Invalid email"))
-    );
+// Chain validations
+var userResult = ValidateName(name)
+    .Bind(n => ValidateEmail(email)
+        .Bind(e => ValidateAge(age)
+            .Bind(a => new User(n, e, a))));
 ```
 
 ### Combining Results
@@ -158,8 +157,8 @@ var nameResult = GetName();
 var emailResult = GetEmail();
 var ageResult = GetAge();
 
-var userResult = ResultExtensions.Combine(nameResult, emailResult, ageResult)
-    .Then(values => new User(values[0], values[1], int.Parse(values[2])));
+var userResult = nameResult.Combine(emailResult, ageResult)
+    .Bind(values => new User(values[0], values[1], int.Parse(values[2])));
 
 // All must succeed, or you get all errors
 if (!userResult.IsSuccess)
@@ -175,7 +174,7 @@ if (!userResult.IsSuccess)
 
 ```csharp
 // Safely execute code that might throw
-var result = ResultExtensions.Try(() =>
+var result = Result.Try(() =>
 {
     return int.Parse("not-a-number"); // This will throw
 });
@@ -184,9 +183,9 @@ var result = ResultExtensions.Try(() =>
 // result.Errors contains the exception details
 
 // Custom error handling
-var customResult = ResultExtensions.Try(
+var customResult = Result.Try(
     () => RiskyOperation(),
-    ex => Error.Create($"Operation failed: {ex.Message}", "RISKY_OP_FAILED", ex));
+    ex => new Error($"Operation failed: {ex.Message}", "RISKY_OP_FAILED"));
 ```
 
 ### Working with None Type
@@ -204,15 +203,15 @@ Result<None> SaveData(string data)
     }
     catch (Exception ex)
     {
-        return Error.Create("Failed to save data", ex);
+        return new Error("Failed to save data");
     }
 }
 
 // Chain void operations
 var saveResult = await ValidateData(data)
-    .ThenAsync(d => SaveDataAsync(d))
-    .ThenAsync(_ => LogSuccessAsync())
-    .ThenAsync(_ => NotifyUsersAsync());
+    .BindAsync(d => SaveDataAsync(d))
+    .BindAsync(_ => LogSuccessAsync())
+    .BindAsync(_ => NotifyUsersAsync());
 ```
 
 ### Advanced Patterns
@@ -229,28 +228,19 @@ var result = GetPrimaryData()
 var recovered = GetUserPreferences()
     .Recover(errors =>
         errors.Any(e => e.Code == "NOT_FOUND")
-            ? GetDefaultPreferences()
-            : Result<Preferences>.Failed(errors));
+            ? "default-preferences"
+            : throw new InvalidOperationException());
 ```
 
-#### Side Effects with Tap
+#### Side Effects with Do
 
 ```csharp
 // Perform side effects without changing the result
 var result = await ProcessDataAsync(input)
-    .TapAsync(data => LogProcessedAsync(data))
-    .TapAsync(data => CacheResultAsync(data))
-    .TapErrorAsync(errors => LogErrorsAsync(errors))
-    .ThenAsync(data => TransformAsync(data));
-```
-
-#### Filtering and Conditional Logic
-
-```csharp
-// Filter results based on conditions
-var result = GetNumbers()
-    .Where(numbers => numbers.Length > 0, Error.Create("No numbers provided"))
-    .Where(numbers => numbers.All(n => n > 0), Error.Create("All numbers must be positive"));
+    .DoAsync(data => LogProcessedAsync(data))
+    .DoAsync(data => CacheResultAsync(data))
+    .DoErrorAsync(errors => LogErrorsAsync(errors))
+    .BindAsync(data => TransformAsync(data));
 ```
 
 ## Async Patterns
@@ -262,27 +252,11 @@ var result = GetNumbers()
 Task<Result<User>> GetUserAsync(int id);
 
 var result = await GetUserAsync(123)
-    .ThenAsync(user => GetProfileAsync(user.Id))
-    .ThenAsync(profile => EnrichProfileAsync(profile))
+    .BindAsync(user => GetProfileAsync(user.Id))
+    .BindAsync(profile => EnrichProfileAsync(profile))
     .MatchAsync(
         onSuccess: profile => $"Welcome {profile.DisplayName}",
         onFailure: errors => "Failed to load profile");
-```
-
-### Parallel Operations
-
-```csharp
-// Combine multiple async operations
-var tasks = new[]
-{
-    GetUserAsync(1),
-    GetUserAsync(2),
-    GetUserAsync(3)
-};
-
-var combinedResult = await ResultExtensions.CombineAsync(tasks);
-// Success: Result<User[]> with all users
-// Failure: Result<User[]> with all errors from failed operations
 ```
 
 ## Best Practices
@@ -303,38 +277,37 @@ Result<string> GetUserNameVerbose() => Result.Success("John Doe");
 ```csharp
 // Good: Fluent pipeline
 var result = input
-    .ToResult()
-    .Then(Validate)
-    .Then(Transform)
-    .Then(Save)
+    .AsResult()
+    .Bind(Validate)
+    .Bind(Transform)
+    .Bind(Save)
     .Match(
         onSuccess: data => $"Saved: {data.Id}",
         onFailure: errors => LogAndReturnError(errors));
 ```
 
-### 3. Use Meaningful Error Messages
+### 3. Use Meaningful Error Messages and Codes
 
 ```csharp
-// Good: Descriptive errors
+// Good: Descriptive errors with codes
 if (age < 0)
-    return Error.Create("Age cannot be negative", "INVALID_AGE")
-        .WithMetadata("provided_age", age);
+    return new Error("Age cannot be negative", "INVALID_AGE");
 
 // Avoid: Generic errors
 if (age < 0)
     return new Error("Invalid input");
 ```
 
-### 4. Combine Related Validations
+### 4. Combine Multiple Results
 
 ```csharp
-// Collect all validation errors
-var userResult = CreateUser(dto)
-    .EnsureAll(
-        (u => !string.IsNullOrEmpty(u.Name), Error.Create("Name required")),
-        (u => IsValidEmail(u.Email), Error.Create("Invalid email")),
-        (u => u.Age >= 18, Error.Create("Must be adult"))
-    );
+// Combine multiple results into one
+var nameResult = GetName();
+var emailResult = GetEmail();
+var ageResult = GetAge();
+
+var userResult = nameResult.Combine(emailResult, ageResult)
+    .Bind(values => new User(values[0], values[1], int.Parse(values[2])));
 ```
 
 ## Performance
@@ -354,9 +327,11 @@ catch (FormatException)
 }
 
 // Result-based (fast)
-return TryParse(userInput)
-    .Then(x => x * 2)
-    .GetValueOrDefault(-1);
+return Result.Try(() => int.Parse(userInput))
+    .Recover(-1)
+    .Match(
+        x => x * 2,
+        _ => -1);
 ```
 
 ## Testing
@@ -364,21 +339,22 @@ return TryParse(userInput)
 Results make testing error conditions straightforward:
 
 ```csharp
-[Test]
+[Fact]
 public void Should_Return_Error_When_Division_By_Zero()
 {
     var result = Calculator.Divide(10, 0);
 
     Assert.False(result.IsSuccess);
-    Assert.Contains(result.Errors, e => e.Message.Contains("division by zero"));
+    Assert.Single(result.Errors);
+    Assert.Contains("division by zero", result.Errors[0].Message);
 }
 
-[Test]
+[Fact]
 public void Should_Chain_Successful_Operations()
 {
     var result = Calculator.Divide(10, 2)
-        .Then(x => x * 3)
-        .Then(x => x.ToString());
+        .Bind(x => x * 3)
+        .Bind(x => x.ToString());
 
     Assert.True(result.IsSuccess);
     Assert.Equal("15", result.Value);
