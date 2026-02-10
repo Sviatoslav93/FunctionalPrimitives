@@ -1,74 +1,101 @@
-using Result.Abstractions;
-
 namespace Result;
 
 /// <summary>
-/// Represents the result of an operation that can either be successful or failed.
+/// Represents the result of an operation, indicating success or failure.
 /// </summary>
-public readonly struct Result<TValue> : IResult<TValue>
+public class Result<T> : IResult
 {
-    private readonly TValue? _value;
     private readonly ResultState _state;
 
-    private Result(TValue value)
+    /// <summary>
+    /// The value of the result if it is successful.
+    /// </summary>
+    private readonly T? _value;
+
+    /// <summary>
+    /// Initializes a new instance of the Result class with the specified value.
+    /// </summary>
+    /// <param name="value">The value to be encapsulated by the Result instance.</param>
+    private Result(T value)
     {
         _value = value;
+        Errors = [];
         _state = ResultState.Success;
     }
 
-    private Result(IEnumerable<Error> errors)
-    {
-        Errors = [.. errors];
-        _state = ResultState.Faulted;
-    }
-
+    /// <summary>
+    /// Initializes a new instance of the Result class with the specified collection of errors.
+    /// </summary>
+    /// <param name="errors">An array of Error objects representing the errors associated with the result. Cannot be null.</param>
     private Result(params Error[] errors)
     {
+        if (errors.Length == 0)
+        {
+            throw new ArgumentException("At least one error must be provided.", nameof(errors));
+        }
+
         Errors = [.. errors];
-        _state = ResultState.Faulted;
+        _state = errors.Length > 0 ? ResultState.Faulted : ResultState.Success;
     }
 
-    public Error[] Errors { get; } = [];
+    /// <summary>
+    /// Gets the collection of errors encountered during the operation.
+    /// </summary>
+    public Error[] Errors { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether the result represents a successful outcome.
+    /// </summary>
     public bool IsSuccess => _state == ResultState.Success;
 
-    public TValue Value => IsSuccess
+    /// <summary>
+    /// Gets the value contained in the result if the operation was successful.
+    /// </summary>
+    /// <remarks>Accessing this property when the result is not successful will throw an exception. Check
+    /// <see cref="IsSuccess"/> before accessing <see cref="Value"/> to avoid exceptions.</remarks>
+    public T Value => IsSuccess
         ? _value!
         : throw new InvalidOperationException("Result is not successful and value can not be accessed.");
 
-    public static implicit operator Result<TValue>(TValue value)
+    /// <summary>
+    /// Allows implicit conversion from a value of type <typeparamref name="T"/> to a <see cref="Result{T}"/> object.
+    /// </summary>
+    /// <param name="value">The value to encapsulate in the <see cref="Result{T}"/> instance.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the specified value.</returns>
+    public static implicit operator Result<T>(T value)
     {
-        return new Result<TValue>(value);
+        return new Result<T>(value);
     }
 
-    public static implicit operator Result<TValue>(Error error)
+    /// <summary>
+    /// Defines an implicit conversion from an <see cref="Error"/> instance to a <see cref="Result{T}"/> instance.
+    /// </summary>
+    /// <param name="error">The error that represents a failed result.</param>
+    /// <returns>A new <see cref="Result{T}"/> instance containing the specified error.</returns>
+    public static implicit operator Result<T>(Error error)
     {
-        return new Result<TValue>(error);
+        return new Result<T>(error);
     }
 
-    public static implicit operator Result<TValue>(Error[] failure)
+    /// <summary>
+    /// Implicitly converts an array of <see cref="Error"/> objects into a <see cref="Result{T}"/> instance
+    /// representing a failure.
+    /// </summary>
+    /// <param name="errors">The array of <see cref="Error"/> objects that describe the failure.</param>
+    /// <returns>A <see cref="Result{T}"/> instance representing a failed result containing the provided errors.</returns>
+    public static implicit operator Result<T>(Error[] errors)
     {
-        return new Result<TValue>(failure);
+        return new Result<T>(errors);
     }
 
-    public static implicit operator bool(Result<TValue> result) => result.IsSuccess;
-
-    public static Result<TValue> Success(TValue value) => new(value);
-
-    public static Result<TValue> Failed(params Error[] errors) => new(errors);
-
-    public static Result<TValue> Failed(IEnumerable<Error> errors) => new(errors);
-
-    public void Deconstruct(out TValue? value, out IEnumerable<Error> errors)
+    /// <summary>
+    /// Deconstructs the result into its value and collection of errors.
+    /// </summary>
+    /// <param name="value">The value encapsulated by the result if the operation is successful; otherwise, null.</param>
+    /// <param name="errors">The collection of errors associated with the result.</param>
+    public void Deconstruct(out T? value, out IEnumerable<Error> errors)
     {
         value = _value;
         errors = Errors;
-    }
-
-    public override string ToString()
-    {
-        return IsSuccess
-            ? $"Success: {Value}"
-            : $"Failed: {string.Join(", ", Errors.Select(e => e.Message))}";
     }
 }

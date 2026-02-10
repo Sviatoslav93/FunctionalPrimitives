@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\Result.Abstractions\Result.Abstractions.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="..\..\README.md">
             <Link>README.md</Link>
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -14,15 +10,8 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <TargetFramework>net8.0</TargetFramework>
-
-    </PropertyGroup>
-
-    <PropertyGroup>
         <PackageId>Sviatoslav93.Result</PackageId>
-        <Version>2.1.0</Version>
+        <Version>3.0.0</Version>
         <Authors>Sviatoslav Kindrat</Authors>
         <PackageTags>Result, Results, Error Handling</PackageTags>
         <RepositoryUrl>https://github.com/Sviatoslav93/Result</RepositoryUrl>

@@ -1,11 +1,10 @@
-using System.Collections;
-using Result.Abstractions;
-
 namespace Result.Example;
 
 public static partial class TestService
 {
-    public static Result<decimal> Divide(decimal a, decimal b)
+    public static Result<decimal> Divide(
+        decimal a,
+        decimal b)
     {
         Console.WriteLine($"Divide {a} by {b}");
         if (b == 0)
@@ -16,7 +15,10 @@ public static partial class TestService
         return a / b;
     }
 
-    public static async Task<Result<decimal>> DivideAsync(decimal a, decimal b, CancellationToken cancellationToken = default)
+    public static async Task<Result<decimal>> DivideAsync(
+        decimal a,
+        decimal b,
+        CancellationToken cancellationToken = default)
     {
         Console.WriteLine($"Divide {a} by {b}");
         await Task.Delay(1000, cancellationToken);

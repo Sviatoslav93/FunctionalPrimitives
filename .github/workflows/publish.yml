@@ -14,11 +14,8 @@ jobs:
             - name: Setup dotnet
               uses: actions/setup-dotnet@v4
               with:
-                  dotnet-version: 8.0.x
+                  dotnet-version: 9.0.x
 
-            # Publish abstractions
-            - name: Package
-              run: dotnet pack -c Release src/Result.Abstractions/Result.Abstractions.csproj -o .\artifacts
             - name: Package
               run: dotnet pack -c Release src/Result/Result.csproj -o .\artifacts
             - name: Publish

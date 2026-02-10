@@ -1,6 +1,12 @@
-﻿namespace Result.Extensions;
+namespace Result.Extensions;
 
 public static partial class ResultExtensions
 {
-    public static Result<TValue> AsResult<TValue>(this TValue value) => value;
+    extension<TValue>(TValue value)
+    {
+        /// <summary>
+        /// Gets wraps the value in a Result.
+        /// </summary>
+        public Result<TValue> AsResult => value;
+    }
 }
