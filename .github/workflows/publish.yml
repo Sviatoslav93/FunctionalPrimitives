@@ -17,6 +17,6 @@ jobs:
                   dotnet-version: 9.0.x
 
             - name: Package
-              run: dotnet pack -c Release src/Result/Result.csproj -o .\artifacts
+              run: dotnet pack -c Release src/FunctionalPrimitives/FunctionalPrimitives.csproj -o .\artifacts
             - name: Publish
               run: dotnet nuget push .\artifacts\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

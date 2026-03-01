@@ -59,31 +59,31 @@ public sealed class Result<T> : IResult
         : throw new InvalidOperationException("FunctionalPrimitives is not successful and value can not be accessed.");
 
     /// <summary>
-    /// Allows implicit conversion from a value of type <typeparamref name="T"/> to a <see cref="FunctionalPrimitives{T}"/> object.
+    /// Allows implicit conversion from a value of type <typeparamref name="T"/> to a <see cref="Result{T}"/> object.
     /// </summary>
-    /// <param name="value">The value to encapsulate in the <see cref="FunctionalPrimitives{T}"/> instance.</param>
-    /// <returns>A successful <see cref="FunctionalPrimitives{T}"/> containing the specified value.</returns>
+    /// <param name="value">The value to encapsulate in the <see cref="Result{T}"/> instance.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the specified value.</returns>
     public static implicit operator Result<T>(T value)
     {
         return new Result<T>(value);
     }
 
     /// <summary>
-    /// Defines an implicit conversion from an <see cref="Error"/> instance to a <see cref="FunctionalPrimitives{T}"/> instance.
+    /// Defines an implicit conversion from an <see cref="Error"/> instance to a <see cref="Result{T}"/> instance.
     /// </summary>
     /// <param name="error">The error that represents a failed result.</param>
-    /// <returns>A new <see cref="FunctionalPrimitives{T}"/> instance containing the specified error.</returns>
+    /// <returns>A new <see cref="Result{T}"/> instance containing the specified error.</returns>
     public static implicit operator Result<T>(Error error)
     {
         return new Result<T>(error);
     }
 
     /// <summary>
-    /// Implicitly converts an array of <see cref="Error"/> objects into a <see cref="FunctionalPrimitives{T}"/> instance
+    /// Implicitly converts an array of <see cref="Error"/> objects into a <see cref="Result{T}"/> instance
     /// representing a failure.
     /// </summary>
     /// <param name="errors">The array of <see cref="Error"/> objects that describe the failure.</param>
-    /// <returns>A <see cref="FunctionalPrimitives{T}"/> instance representing a failed result containing the provided errors.</returns>
+    /// <returns>A <see cref="Result{T}"/> instance representing a failed result containing the provided errors.</returns>
     public static implicit operator Result<T>(Error[] errors)
     {
         return new Result<T>(errors);

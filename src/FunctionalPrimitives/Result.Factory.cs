@@ -3,11 +3,11 @@ namespace FunctionalPrimitives;
 public static class Result
 {
     /// <summary>
-    /// Creates a successful <see cref="FunctionalPrimitives{T}"/> with the specified value.
+    /// Creates a successful <see cref="Result{T}"/> with the specified value.
     /// </summary>
     /// <typeparam name="T">The type of the value contained in the result.</typeparam>
     /// <param name="value">The value to include in the successful result.</param>
-    /// <returns>A successful <see cref="FunctionalPrimitives{T}"/> containing the specified value.</returns>
+    /// <returns>A successful <see cref="Result{T}"/> containing the specified value.</returns>
     public static Result<T> Success<T>(T value) => value;
 
     public static Result<T> Failure<T>(Error error) => error;
@@ -30,15 +30,15 @@ public static class Result
     }
 
     /// <summary>
-    /// Executes the provided function and returns a successful <see cref="FunctionalPrimitives{T}"/> containing
+    /// Executes the provided function and returns a successful <see cref="Result{T}"/> containing
     /// the function's return value. If the function throws an exception, the exception is converted
     /// to an <see cref="Error"/> using the supplied <paramref name="errorConvert"/> factory and a failed
-    /// <see cref="FunctionalPrimitives{T}"/> is returned.
+    /// <see cref="Result{T}"/> is returned.
     /// </summary>
     /// <typeparam name="T">The type of the value produced by <paramref name="func"/>.</typeparam>
     /// <param name="func">The function to execute.</param>
     /// <param name="errorConvert">A factory that converts an <see cref="Exception"/> into an <see cref="Error"/>.</param>
-    /// <returns>A <see cref="FunctionalPrimitives{T}"/> representing either the successful value or the failure error.</returns>
+    /// <returns>A <see cref="Result{T}"/> representing either the successful value or the failure error.</returns>
     public static Result<T> Try<T>(Func<T> func, Func<Exception, Error>? errorConvert = null)
     {
         try
@@ -52,14 +52,14 @@ public static class Result
     }
 
     /// <summary>
-    /// Executes the provided asynchronous function and wraps its result in a <see cref="FunctionalPrimitives{T}"/>.
+    /// Executes the provided asynchronous function and wraps its result in a <see cref="Result{T}"/>.
     /// If the function throws an exception, the exception is converted into an <see cref="Error"/> using the specified error factory.
     /// </summary>
     /// <typeparam name="T">The type of the value returned by the asynchronous function.</typeparam>
     /// <param name="func">The asynchronous function to execute.</param>
     /// <param name="errorConvert">A function to convert exceptions into an <see cref="Error"/> instance.</param>
     /// <returns>
-    /// A <see cref="Task{TResult}"/> representing the asynchronous operation that results in a <see cref="FunctionalPrimitives{T}"/>
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation that results in a <see cref="Result{T}"/>
     /// containing the function's return value, or an error if an exception is thrown.
     /// </returns>
     public static async Task<Result<T>> TryAsync<T>(Func<Task<T>> func, Func<Exception, Error>? errorConvert = null)

@@ -41,7 +41,7 @@ public static partial class ResultExtensions
         }
 
         /// <summary>
-        /// Processes a <see cref="FunctionalPrimitives{TValue}"/> by executing the provided success or failure functions
+        /// Processes a <see cref="Result{TValue}"/> by executing the provided success or failure functions
         /// based on its state, and returns a value of type <typeparamref name="TNext"/>.
         /// </summary>
         /// <param name="onSuccess">A function to execute if the result is successful. It takes the success value of type <typeparamref name="TValue"/> and returns a value of type <typeparamref name="TNext"/>.</param>
@@ -99,7 +99,7 @@ public static partial class ResultExtensions
         }
 
         /// <summary>
-        /// Asynchronously processes a <see cref="Task{TResult}"/> of <see cref="FunctionalPrimitives{TValue}"/> by applying the specified success or failure handling functions.
+        /// Asynchronously processes a <see cref="Task{TResult}"/> of <see cref="Result{TValue}"/> by applying the specified success or failure handling functions.
         /// </summary>
         /// <param name="onSuccess">A function to execute when the result is successful. The function receives the success value of type <typeparamref name="TValue"/> and returns a value of type <typeparamref name="TNext"/>.</param>
         /// <param name="onFailure">A function to execute when the result is a failure. The function receives a collection of <see cref="Error"/> and returns a <see cref="Task{TNext}"/>.</param>
@@ -116,7 +116,7 @@ public static partial class ResultExtensions
         }
 
         /// <summary>
-        /// Processes a <see cref="Task{TResult}"/> of <see cref="FunctionalPrimitives{TValue}"/> asynchronously by executing the provided success or failure functions
+        /// Processes a <see cref="Task{TResult}"/> of <see cref="Result{TValue}"/> asynchronously by executing the provided success or failure functions
         /// based on the state of the result.
         /// </summary>
         /// <param name="onSuccess">A function to execute when the result is successful. The function takes a success value of type <typeparamref name="TValue"/> and returns a <see cref="Task{TNext}"/>.</param>

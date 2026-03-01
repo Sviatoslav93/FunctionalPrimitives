@@ -3,12 +3,12 @@ namespace FunctionalPrimitives.Extensions.Result;
 public static partial class ResultExtensions
 {
     /// <summary>
-    /// Provides extension methods for performing operations on <see cref="FunctionalPrimitives{TValue}"/> objects.
+    /// Provides extension methods for performing operations on <see cref="Result{TValue}"/> objects.
     /// </summary>
     extension<TValue>(Result<TValue> result)
     {
         /// <summary>
-        /// Transforms a <see cref="FunctionalPrimitives{TValue}"/> into a value of type <typeparamref name="TNext"/>
+        /// Transforms a <see cref="Result{TValue}"/> into a value of type <typeparamref name="TNext"/>
         /// using specified functions for success and failure scenarios.
         /// </summary>
         /// <typeparam name="TNext">The type of the result after transformation.</typeparam>
