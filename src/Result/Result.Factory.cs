@@ -22,9 +22,11 @@ public static class Result
     /// <exception cref="ArgumentException">Thrown when the <paramref name="errors"/> collection is empty.</exception>
     public static Result<T> Failure<T>(IEnumerable<Error> errors)
     {
-        var enumerable = errors as Error[] ?? [.. errors];
+        ArgumentNullException.ThrowIfNull(errors);
 
-        return enumerable.ToArray();
+        var array = errors as Error[] ?? [.. errors];
+
+        return array;
     }
 
     /// <summary>

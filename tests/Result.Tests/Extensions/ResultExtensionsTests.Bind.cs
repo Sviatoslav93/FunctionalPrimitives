@@ -62,7 +62,7 @@ public partial class ResultExtensionsTests
 
         // Assert
         actual.IsSuccess.ShouldBeFalse();
-        actual.Errors.Length.ShouldBe(2);
+        actual.Errors.Count.ShouldBe(2);
         actual.Errors.ShouldBeEquivalentTo(result.Errors);
     }
 

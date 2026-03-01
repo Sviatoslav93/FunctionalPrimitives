@@ -27,7 +27,7 @@ public static partial class ResultExtensions
         {
             return result.IsSuccess
                 ? await onSuccess(result.Value).ConfigureAwait(false)
-                : result.Errors;
+                : result.Errors.ToArray();
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ public static partial class ResultExtensions
         {
             return result.IsSuccess
                 ? await onSuccess(result.Value).ConfigureAwait(false)
-                : result.Errors;
+                : result.Errors.ToArray();
         }
     }
 

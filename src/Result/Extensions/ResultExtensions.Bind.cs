@@ -19,7 +19,7 @@ public static partial class ResultExtensions
         {
             return result.IsSuccess
                 ? onSuccess(result.Value)
-                : result.Errors;
+                : result.Errors.ToArray();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ public static partial class ResultExtensions
         {
             return result.IsSuccess
                 ? onSuccess(result.Value)
-                : result.Errors;
+                : result.Errors.ToArray();
         }
     }
 }

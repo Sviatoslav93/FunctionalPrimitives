@@ -3,14 +3,14 @@ namespace Result;
 /// <summary>
 /// Represents the result of an operation, indicating success or failure.
 /// </summary>
-public class Result<T> : IResult
+public sealed class Result<T> : IResult
 {
-    private readonly ResultState _state;
-
     /// <summary>
     /// The value of the result if it is successful.
     /// </summary>
     private readonly T? _value;
+
+    private readonly Error[] _errors;
 
     /// <summary>
     /// Initializes a new instance of the Result class with the specified value.
@@ -19,8 +19,7 @@ public class Result<T> : IResult
     private Result(T value)
     {
         _value = value;
-        Errors = [];
-        _state = ResultState.Success;
+        _errors = [];
     }
 
     /// <summary>
@@ -34,19 +33,21 @@ public class Result<T> : IResult
             throw new ArgumentException("At least one error must be provided.", nameof(errors));
         }
 
-        Errors = [.. errors];
-        _state = errors.Length > 0 ? ResultState.Faulted : ResultState.Success;
+        _value = default;
+        _errors = [.. errors];
     }
 
     /// <summary>
     /// Gets the collection of errors encountered during the operation.
     /// </summary>
-    public Error[] Errors { get; }
+    public IReadOnlyCollection<Error> Errors => _errors;
 
     /// <summary>
     /// Gets a value indicating whether the result represents a successful outcome.
     /// </summary>
-    public bool IsSuccess => _state == ResultState.Success;
+    public bool IsSuccess => Errors.Count == 0;
+
+    public bool IsFailure => !IsSuccess;
 
     /// <summary>
     /// Gets the value contained in the result if the operation was successful.
@@ -93,7 +94,7 @@ public class Result<T> : IResult
     /// </summary>
     /// <param name="value">The value encapsulated by the result if the operation is successful; otherwise, null.</param>
     /// <param name="errors">The collection of errors associated with the result.</param>
-    public void Deconstruct(out T? value, out IEnumerable<Error> errors)
+    public void Deconstruct(out T? value, out IReadOnlyCollection<Error> errors)
     {
         value = _value;
         errors = Errors;

@@ -116,7 +116,7 @@ public partial class ResultExtensionsTests
         capturedErrors.ShouldNotBeNull();
         capturedErrors.ShouldBeSameAs(result.Errors);
         actualResult.IsSuccess.ShouldBeFalse();
-        actualResult.Errors.Length.ShouldBe(2);
+        actualResult.Errors.Count.ShouldBe(2);
         ReferenceEquals(result, actualResult).ShouldBeTrue();
     }
 

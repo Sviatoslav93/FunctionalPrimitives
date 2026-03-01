@@ -193,7 +193,7 @@ public partial class ResultExtensionsTests
 
         // Assert
         actualResult.IsSuccess.ShouldBeFalse();
-        actualResult.Errors.Length.ShouldBe(2);
+        actualResult.Errors.Count.ShouldBe(2);
         executed.ShouldBeFalse();
     }
 
@@ -336,7 +336,7 @@ public partial class ResultExtensionsTests
 
         // Assert
         actualResult.IsSuccess.ShouldBeFalse();
-        actualResult.Errors.Length.ShouldBe(3);
+        actualResult.Errors.Count.ShouldBe(3);
         executed.ShouldBeTrue();
         capturedErrors.ShouldNotBeNull();
         capturedErrors.Count().ShouldBe(3);

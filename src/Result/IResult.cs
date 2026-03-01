@@ -13,5 +13,5 @@ public interface IResult
     /// <summary>
     /// Gets the collection of errors encountered during the operation.
     /// </summary>
-    Error[] Errors { get; }
+    IReadOnlyCollection<Error> Errors { get; }
 }
