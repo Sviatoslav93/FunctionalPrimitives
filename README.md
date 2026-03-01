@@ -1,10 +1,12 @@
-# Result
+# Functional Primitives for C#
 
 [![Build Status](https://github.com/Sviatoslav93/Result/workflows/build/badge.svg)](https://github.com/Sviatoslav93/Result/actions)
 [![NuGet](https://img.shields.io/nuget/v/Sviatoslav93.Result.svg)](https://www.nuget.org/packages/Sviatoslav93.Result/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A robust, functional approach to error handling in C#. The Result pattern is an alternative to exception-based error handling that makes error states explicit and composable.
+A robust, functional approach to error handling in C#.
+The Result pattern is an alternative to exception-based error handling that makes error states explicit and composable.
+The Maybe monad is a powerful tool for handling errors, allowing for more expressive and composable code.
 
 ## Features
 

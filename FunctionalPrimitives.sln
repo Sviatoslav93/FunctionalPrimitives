@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9370E2F-6767-4E42-A1EA-FA5F6E824987}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalPrimitives", "src\FunctionalPrimitives\FunctionalPrimitives.csproj", "{4B1F0923-1FAA-4110-BEF7-FE228F292060}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EDA025AB-7AC3-425C-A4E8-BE154C61653B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalPrimitives.Tests", "tests\FunctionalPrimitives.Tests\FunctionalPrimitives.Tests.csproj", "{6205571B-1D89-4D8B-B344-E67369A8F404}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution-items", "solution-items", "{9A479D1C-4607-4DEF-BCE3-3194314C0217}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+		Directory.Build.props = Directory.Build.props
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{F9FEE936-BBCC-4307-A78D-08EE74573D2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalPrimitives.Example", "examples\FunctionalPrimitives.Example\FunctionalPrimitives.Example.csproj", "{63460DC6-5BBE-499F-B930-595E15F1BEBC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B1F0923-1FAA-4110-BEF7-FE228F292060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B1F0923-1FAA-4110-BEF7-FE228F292060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B1F0923-1FAA-4110-BEF7-FE228F292060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B1F0923-1FAA-4110-BEF7-FE228F292060}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6205571B-1D89-4D8B-B344-E67369A8F404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6205571B-1D89-4D8B-B344-E67369A8F404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6205571B-1D89-4D8B-B344-E67369A8F404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6205571B-1D89-4D8B-B344-E67369A8F404}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63460DC6-5BBE-499F-B930-595E15F1BEBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63460DC6-5BBE-499F-B930-595E15F1BEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63460DC6-5BBE-499F-B930-595E15F1BEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63460DC6-5BBE-499F-B930-595E15F1BEBC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4B1F0923-1FAA-4110-BEF7-FE228F292060} = {B9370E2F-6767-4E42-A1EA-FA5F6E824987}
+		{6205571B-1D89-4D8B-B344-E67369A8F404} = {EDA025AB-7AC3-425C-A4E8-BE154C61653B}
+		{63460DC6-5BBE-499F-B930-595E15F1BEBC} = {F9FEE936-BBCC-4307-A78D-08EE74573D2A}
+	EndGlobalSection
+EndGlobal
