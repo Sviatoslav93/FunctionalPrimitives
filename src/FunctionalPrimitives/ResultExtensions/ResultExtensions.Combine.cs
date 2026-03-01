@@ -1,4 +1,4 @@
-namespace FunctionalPrimitives.Extensions.Result;
+namespace FunctionalPrimitives.ResultExtensions;
 
 public static partial class ResultExtensions
 {
@@ -35,8 +35,8 @@ public static partial class ResultExtensions
             }
 
             return errors.Count > 0
-                ? FunctionalPrimitives.Result.Failure<TValue[]>(errors)
-                : FunctionalPrimitives.Result.Success(values.ToArray());
+                ? Result.Failure<TValue[]>(errors)
+                : Result.Success(values.ToArray());
         }
     }
 

@@ -1,5 +1,5 @@
 using FunctionalPrimitives.Example;
-using FunctionalPrimitives.Extensions.Result;
+using FunctionalPrimitives.ResultExtensions;
 
 // Example #1 sync and success
 var res1 = TestService.Divide(10, 2)

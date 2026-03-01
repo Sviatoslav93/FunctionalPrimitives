@@ -9,10 +9,6 @@
         </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Extensions\Maybe\" />
-    </ItemGroup>
-
     <PropertyGroup>
         <PackageId>Sviatoslav93.FunctionalPrimitives</PackageId>
         <Version>1.0.0</Version>

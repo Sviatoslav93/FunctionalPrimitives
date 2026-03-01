@@ -1,4 +1,4 @@
-namespace FunctionalPrimitives.Extensions.Result;
+namespace FunctionalPrimitives.ResultExtensions;
 
 public partial class ResultExtensions
 {
@@ -25,7 +25,7 @@ public partial class ResultExtensions
                 return result;
 
             var recoveredValue = await recovery(result.Errors).ConfigureAwait(false);
-            return FunctionalPrimitives.Result.Success(recoveredValue);
+            return Result.Success(recoveredValue);
         }
 
         /// <summary>

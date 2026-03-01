@@ -1,4 +1,4 @@
-namespace FunctionalPrimitives.Extensions.Result;
+namespace FunctionalPrimitives.ResultExtensions;
 
 public static partial class ResultExtensions
 {
