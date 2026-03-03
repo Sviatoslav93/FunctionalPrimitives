@@ -1,4 +1,4 @@
-﻿namespace FunctionalPrimitives.Maybe;
+﻿namespace FunctionalPrimitives;
 
 public readonly struct Maybe<T>
 {
@@ -12,8 +12,6 @@ public readonly struct Maybe<T>
 
     public bool HasValue { get; }
 
-    public bool HasNoValue => !HasValue;
-
     public T Value =>
         HasValue
             ? _value!
@@ -23,22 +21,13 @@ public readonly struct Maybe<T>
     public static Maybe<T> None { get; } = default;
 #pragma warning restore SA1204
 
-    public static Maybe<T> Some(T value)
+    public static Maybe<TValue> Some<TValue>(TValue value)
     {
         return value is null
             ? throw new ArgumentNullException(nameof(value))
-            : new Maybe<T>(value);
+            : new Maybe<TValue>(value);
     }
 
     public T GetValueOrDefault(T defaultValue) =>
         HasValue ? _value! : defaultValue;
-
-    public TResult Match<TResult>(
-        Func<T, TResult> onSome,
-        Func<TResult> onNone)
-    {
-        return HasValue
-            ? onSome(_value!)
-            : onNone();
-    }
 }

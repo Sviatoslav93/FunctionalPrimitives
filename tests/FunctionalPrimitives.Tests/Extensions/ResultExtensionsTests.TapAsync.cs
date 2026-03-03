@@ -1,4 +1,4 @@
-using FunctionalPrimitives.ResultExtensions;
+using FunctionalPrimitives.Extensions;
 using Shouldly;
 using Xunit;
 
@@ -7,14 +7,14 @@ namespace FunctionalPrimitives.Tests.Extensions;
 public partial class ResultExtensionsTests
 {
     [Fact]
-    public async Task DoAsync_ShouldExecuteAction_When_ResultIsSuccess()
+    public async Task TapAsync_ShouldExecuteAction_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         Result<string> result = "test";
 
         // Act
-        var actualResult = await result.DoAsync(async _ =>
+        var actualResult = await result.TapAsync(async _ =>
         {
             await Task.Delay(0);
             executed = true;
@@ -27,7 +27,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoAsync_ShouldNotExecuteAction_When_ResultIsFailure()
+    public async Task TapAsync_ShouldNotExecuteAction_When_ResultIsFailure()
     {
         // Arrange
         var executed = false;
@@ -35,7 +35,7 @@ public partial class ResultExtensionsTests
         var result = Result.Failure<string>(error);
 
         // Act
-        var actualResult = await result.DoAsync(async _ =>
+        var actualResult = await result.TapAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -48,7 +48,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoAsync_ShouldPassCorrectValue_When_ResultIsSuccess()
+    public async Task TapAsync_ShouldPassCorrectValue_When_ResultIsSuccess()
     {
         // Arrange
         var capturedValue = string.Empty;
@@ -56,7 +56,7 @@ public partial class ResultExtensionsTests
         var result = Result.Success(expectedValue);
 
         // Act
-        await result.DoAsync(async value =>
+        await result.TapAsync(async value =>
         {
             await Task.Delay(1);
             capturedValue = value;
@@ -67,14 +67,14 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoAsync_WithTaskResult_ShouldExecuteSyncAction_When_ResultIsSuccess()
+    public async Task TapAsync_WithTaskResult_ShouldExecuteSyncAction_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         var task = Task.FromResult(Result.Success("test"));
 
         // Act
-        var actualResult = await task.DoAsync(_ => executed = true);
+        var actualResult = await task.TapAsync(_ => executed = true);
 
         // Assert
         actualResult.IsSuccess.ShouldBeTrue();
@@ -91,7 +91,7 @@ public partial class ResultExtensionsTests
         var task = Task.FromResult(Result.Failure<string>(error));
 
         // Act
-        var actualResult = await task.DoAsync(_ => executed = true);
+        var actualResult = await task.TapAsync(_ => executed = true);
 
         // Assert
         actualResult.IsSuccess.ShouldBeFalse();
@@ -100,14 +100,14 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoAsync_WithTaskResult_ShouldExecuteAsyncAction_When_ResultIsSuccess()
+    public async Task TapAsync_WithTaskResult_ShouldExecuteAsyncAction_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         var task = Task.FromResult(Result.Success("test"));
 
         // Act
-        var actualResult = await task.DoAsync(async _ =>
+        var actualResult = await task.TapAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -128,7 +128,7 @@ public partial class ResultExtensionsTests
         var task = Task.FromResult(Result.Failure<string>(error));
 
         // Act
-        var actualResult = await task.DoAsync(async _ =>
+        var actualResult = await task.TapAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -141,14 +141,14 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoAsync_ShouldMaintainResultIntegrity_When_ActionThrows()
+    public async Task TapAsync_ShouldMaintainResultIntegrity_When_ActionThrows()
     {
         // Arrange
         var result = Result.Success("test");
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            result.DoAsync(async _ =>
+            result.TapAsync(async _ =>
             {
                 await Task.Delay(1);
                 throw new InvalidOperationException("Action failed");
@@ -158,7 +158,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoAsync_WithComplexValue_ShouldExecuteCorrectly()
+    public async Task TapAsync_WithComplexValue_ShouldExecuteCorrectly()
     {
         // Arrange
         var person = new { Name = "John", Age = 30 };
@@ -166,7 +166,7 @@ public partial class ResultExtensionsTests
         var capturedPerson = default(object);
 
         // Act
-        var actualResult = await result.DoAsync(async value =>
+        var actualResult = await result.TapAsync(async value =>
         {
             await Task.Delay(1);
             capturedPerson = value;
@@ -177,7 +177,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoAsync_WithMultipleErrors_ShouldNotExecuteAction()
+    public async Task TapAsync_WithMultipleErrors_ShouldNotExecuteAction()
     {
         // Arrange
         var executed = false;
@@ -185,7 +185,7 @@ public partial class ResultExtensionsTests
         var result = Result.Failure<string>(errors);
 
         // Act
-        var actualResult = await result.DoAsync(async _ =>
+        var actualResult = await result.TapAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -198,7 +198,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_ShouldExecuteAction_When_ResultIsFailure()
+    public async Task TapErrorAsync_ShouldExecuteAction_When_ResultIsFailure()
     {
         // Arrange
         var executed = false;
@@ -206,7 +206,7 @@ public partial class ResultExtensionsTests
         var result = Result.Failure<string>(error);
 
         // Act
-        var actualResult = await result.DoErrorAsync(async _ =>
+        var actualResult = await result.TapErrorAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -219,14 +219,14 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_ShouldNotExecuteAction_When_ResultIsSuccess()
+    public async Task TapErrorAsync_ShouldNotExecuteAction_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         Result<string> result = "test";
 
         // Act
-        var actualResult = await result.DoErrorAsync(async _ =>
+        var actualResult = await result.TapErrorAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -239,7 +239,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_ShouldPassCorrectErrors_When_ResultIsFailure()
+    public async Task TapErrorAsync_ShouldPassCorrectErrors_When_ResultIsFailure()
     {
         // Arrange
         IEnumerable<Error> capturedErrors = [];
@@ -247,7 +247,7 @@ public partial class ResultExtensionsTests
         var result = Result.Failure<string>(expectedErrors);
 
         // Act
-        await result.DoErrorAsync(async errors =>
+        await result.TapErrorAsync(async errors =>
         {
             await Task.Delay(1);
             capturedErrors = errors;
@@ -259,7 +259,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_WithTaskResult_ShouldExecuteAction_When_ResultIsFailure()
+    public async Task TapErrorAsync_WithTaskResult_ShouldExecuteAction_When_ResultIsFailure()
     {
         // Arrange
         var executed = false;
@@ -267,7 +267,7 @@ public partial class ResultExtensionsTests
         var task = Task.FromResult(Result.Failure<string>(error));
 
         // Act
-        var actualResult = await task.DoErrorAsync(async _ =>
+        var actualResult = await task.TapErrorAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -280,14 +280,14 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_WithTaskResult_ShouldNotExecuteAction_When_ResultIsSuccess()
+    public async Task TapErrorAsync_WithTaskResult_ShouldNotExecuteAction_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         var task = Task.FromResult(Result.Success("test"));
 
         // Act
-        var actualResult = await task.DoErrorAsync(async _ =>
+        var actualResult = await task.TapErrorAsync(async _ =>
         {
             await Task.Delay(1);
             executed = true;
@@ -300,7 +300,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_ShouldMaintainResultIntegrity_When_ActionThrows()
+    public async Task TapErrorAsync_ShouldMaintainResultIntegrity_When_ActionThrows()
     {
         // Arrange
         var error = new Error("test error");
@@ -308,7 +308,7 @@ public partial class ResultExtensionsTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            result.DoErrorAsync(async _ =>
+            result.TapErrorAsync(async _ =>
             {
                 await Task.Delay(1);
                 throw new InvalidOperationException("Action failed");
@@ -318,7 +318,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_WithMultipleErrors_ShouldExecuteActionAndPassAllErrors()
+    public async Task TapErrorAsync_WithMultipleErrors_ShouldExecuteActionAndPassAllErrors()
     {
         // Arrange
         var executed = false;
@@ -327,7 +327,7 @@ public partial class ResultExtensionsTests
         var result = Result.Failure<string>(errors);
 
         // Act
-        var actualResult = await result.DoErrorAsync(async errs =>
+        var actualResult = await result.TapErrorAsync(async errs =>
         {
             await Task.Delay(1);
             capturedErrors = errs;
@@ -343,14 +343,14 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_ShouldReturnSameResult_When_ResultIsFailure()
+    public async Task TapErrorAsync_ShouldReturnSameResult_When_ResultIsFailure()
     {
         // Arrange
         var error = new Error("test error");
         var result = Result.Failure<string>(error);
 
         // Act
-        var actualResult = await result.DoErrorAsync(async _ => await Task.Delay(1));
+        var actualResult = await result.TapErrorAsync(async _ => await Task.Delay(1));
 
         // Assert
         actualResult.ShouldBe(result);
@@ -359,13 +359,13 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public async Task DoErrorAsync_ShouldReturnSameResult_When_ResultIsSuccess()
+    public async Task TapErrorAsync_ShouldReturnSameResult_When_ResultIsSuccess()
     {
         // Arrange
         Result<string> result = "test";
 
         // Act
-        var actualResult = await result.DoErrorAsync(async _ => await Task.Delay(1));
+        var actualResult = await result.TapErrorAsync(async _ => await Task.Delay(1));
 
         // Assert
         actualResult.ShouldBe(result);

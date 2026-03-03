@@ -1,5 +1,5 @@
 using FunctionalPrimitives.Example;
-using FunctionalPrimitives.ResultExtensions;
+using FunctionalPrimitives.Extensions;
 
 // Example #1 sync and success
 var res1 = TestService.Divide(10, 2)
@@ -50,3 +50,5 @@ var res4 = await TestService.DivideAsync(10, 2)
         value => $"FunctionalPrimitives: {value}",
         errors => $"Errors: {string.Join(", ", errors)}");
 Console.WriteLine(res4);
+
+ValidationExample.Example();

@@ -1,4 +1,4 @@
-﻿using FunctionalPrimitives.ResultExtensions;
+﻿using FunctionalPrimitives.Extensions;
 using Shouldly;
 using Xunit;
 

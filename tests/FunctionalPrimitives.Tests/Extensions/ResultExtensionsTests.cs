@@ -1,4 +1,4 @@
-using FunctionalPrimitives.ResultExtensions;
+using FunctionalPrimitives.Extensions;
 using Xunit;
 
 namespace FunctionalPrimitives.Tests.Extensions;

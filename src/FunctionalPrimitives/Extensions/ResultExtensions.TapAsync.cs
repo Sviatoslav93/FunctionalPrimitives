@@ -1,4 +1,4 @@
-namespace FunctionalPrimitives.ResultExtensions;
+namespace FunctionalPrimitives.Extensions;
 
 public partial class ResultExtensions
 {
@@ -15,7 +15,7 @@ public partial class ResultExtensions
         /// </summary>
         /// <param name="action">The asynchronous action to execute on the value of the result.</param>
         /// <returns>A task representing the result, retaining its original state unless the action modifies it.</returns>
-        public Task<Result<TValue>> DoAsync(
+        public Task<Result<TValue>> TapAsync(
             Func<TValue, Task> action)
         {
             return result.BindAsync(async x =>
@@ -31,7 +31,7 @@ public partial class ResultExtensions
         /// </summary>
         /// <param name="action">The asynchronous action to execute on the errors of the result.</param>
         /// <returns>A task representing the result, retaining its original state regardless of the action execution.</returns>
-        public async Task<Result<TValue>> DoErrorAsync(
+        public async Task<Result<TValue>> TapErrorAsync(
             Func<IEnumerable<Error>, Task> action)
         {
             if (!result.IsSuccess)
@@ -52,10 +52,10 @@ public partial class ResultExtensions
         /// </summary>
         /// <param name="action">The synchronous action to execute on the value of the result if it is successful.</param>
         /// <returns>A task containing the result of the operation, retaining its original state unless the action modifies it.</returns>
-        public async Task<Result<TValue>> DoAsync(Action<TValue> action)
+        public async Task<Result<TValue>> TapAsync(Action<TValue> action)
         {
             var result = await task.ConfigureAwait(false);
-            return result.Do(action);
+            return result.Tap(action);
         }
 
         /// <summary>
@@ -63,10 +63,10 @@ public partial class ResultExtensions
         /// </summary>
         /// <param name="action">The asynchronous action to execute on the value of the successful result.</param>
         /// <returns>A task that represents the result, retaining its original state unless the action modifies it.</returns>
-        public async Task<Result<TValue>> DoAsync(Func<TValue, Task> action)
+        public async Task<Result<TValue>> TapAsync(Func<TValue, Task> action)
         {
             var result = await task.ConfigureAwait(false);
-            return await result.DoAsync(action).ConfigureAwait(false);
+            return await result.TapAsync(action).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -74,10 +74,10 @@ public partial class ResultExtensions
         /// </summary>
         /// <param name="action">The asynchronous action to execute on the errors of the result.</param>
         /// <returns>A task representing the result, retaining its original state unless the action modifies it.</returns>
-        public async Task<Result<TValue>> DoErrorAsync(Func<IEnumerable<Error>, Task> action)
+        public async Task<Result<TValue>> TapErrorAsync(Func<IEnumerable<Error>, Task> action)
         {
             var result = await task.ConfigureAwait(false);
-            return await result.DoErrorAsync(action).ConfigureAwait(false);
+            return await result.TapErrorAsync(action).ConfigureAwait(false);
         }
     }
 }

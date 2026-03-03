@@ -1,4 +1,4 @@
-using FunctionalPrimitives.ResultExtensions;
+using FunctionalPrimitives.Extensions;
 using Shouldly;
 using Xunit;
 
@@ -7,14 +7,14 @@ namespace FunctionalPrimitives.Tests.Extensions;
 public partial class ResultExtensionsTests
 {
     [Fact]
-    public void Do_ShouldExecuteAction_When_ResultIsSuccess()
+    public void Tap_ShouldExecuteAction_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         Result<string> result = "test";
 
         // Act
-        var actualResult = result.Do(_ => executed = true);
+        var actualResult = result.Tap(_ => executed = true);
 
         // Assert
         actualResult.IsSuccess.ShouldBeTrue();
@@ -23,7 +23,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public void Do_ShouldNotExecuteAction_When_ResultIsFailure()
+    public void Tap_ShouldNotExecuteAction_When_ResultIsFailure()
     {
         // Arrange
         var executed = false;
@@ -31,7 +31,7 @@ public partial class ResultExtensionsTests
         var result = Result.Failure<string>(error);
 
         // Act
-        var actualResult = result.Do(_ => executed = true);
+        var actualResult = result.Tap(_ => executed = true);
 
         // Assert
         actualResult.IsSuccess.ShouldBeFalse();
@@ -41,7 +41,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public void Do_ShouldPassCorrectValue_When_ResultIsSuccess()
+    public void Tap_ShouldPassCorrectValue_When_ResultIsSuccess()
     {
         // Arrange
         var capturedValue = string.Empty;
@@ -49,34 +49,34 @@ public partial class ResultExtensionsTests
         var result = Result.Success(expectedValue);
 
         // Act
-        result.Do(value => capturedValue = value);
+        result.Tap(value => capturedValue = value);
 
         // Assert
         capturedValue.ShouldBe(expectedValue);
     }
 
     [Fact]
-    public void Do_ShouldMaintainResultIntegrity_When_ActionThrows()
+    public void Tap_ShouldMaintainResultIntegrity_When_ActionThrows()
     {
         // Arrange
         var result = Result.Success("test");
 
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() =>
-            result.Do(_ => throw new InvalidOperationException("Action failed")));
+            result.Tap(_ => throw new InvalidOperationException("Action failed")));
 
         exception.Message.ShouldBe("Action failed");
     }
 
     [Fact]
-    public void Do_WithNoArgAction_ShouldExecute_When_ResultIsSuccess()
+    public void Tap_WithNoArgAction_ShouldExecute_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         Result<int> result = 42;
 
         // Act
-        var actualResult = result.Do(() => executed = true);
+        var actualResult = result.Tap(() => executed = true);
 
         // Assert
         actualResult.IsSuccess.ShouldBeTrue();
@@ -85,7 +85,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public void Do_WithNoArgAction_ShouldNotExecute_When_ResultIsFailure()
+    public void Tap_WithNoArgAction_ShouldNotExecute_When_ResultIsFailure()
     {
         // Arrange
         var error = new Error("test error");
@@ -93,7 +93,7 @@ public partial class ResultExtensionsTests
         var executed = false;
 
         // Act
-        var actualResult = result.Do(() => executed = true);
+        var actualResult = result.Tap(() => executed = true);
 
         // Assert
         actualResult.IsSuccess.ShouldBeFalse();
@@ -102,7 +102,7 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public void DoError_ShouldExecute_When_ResultIsFailure()
+    public void TapError_ShouldExecute_When_ResultIsFailure()
     {
         // Arrange
         var errors = new[] { new Error("error1"), new Error("error2") };
@@ -110,7 +110,7 @@ public partial class ResultExtensionsTests
         IEnumerable<Error>? capturedErrors = null;
 
         // Act
-        var actualResult = result.DoError(errs => capturedErrors = errs);
+        var actualResult = result.TapError(errs => capturedErrors = errs);
 
         // Assert
         capturedErrors.ShouldNotBeNull();
@@ -121,14 +121,14 @@ public partial class ResultExtensionsTests
     }
 
     [Fact]
-    public void DoError_ShouldNotExecute_When_ResultIsSuccess()
+    public void TapError_ShouldNotExecute_When_ResultIsSuccess()
     {
         // Arrange
         var executed = false;
         Result<string> result = "ok";
 
         // Act
-        var actualResult = result.DoError(_ => executed = true);
+        var actualResult = result.TapError(_ => executed = true);
 
         // Assert
         executed.ShouldBeFalse();

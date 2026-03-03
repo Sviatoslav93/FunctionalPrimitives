@@ -1,4 +1,4 @@
-namespace FunctionalPrimitives.ResultExtensions;
+namespace FunctionalPrimitives.Extensions;
 
 public static partial class ResultExtensions
 {
@@ -12,7 +12,7 @@ public static partial class ResultExtensions
         /// </summary>
         /// <param name="action">The action to execute when the result is successful.</param>
         /// <returns>The original result, whether the action is executed or not.</returns>
-        public Result<TValue> Do(Action<TValue> action)
+        public Result<TValue> Tap(Action<TValue> action)
         {
             return result.Match(
                 x =>
@@ -29,7 +29,7 @@ public static partial class ResultExtensions
         /// </summary>
         /// <param name="action">The action to execute when the result is successful.</param>
         /// <returns>The original result, whether the action is executed or not.</returns>
-        public Result<TValue> Do(Action action)
+        public Result<TValue> Tap(Action action)
         {
             return result.Bind(x =>
             {
@@ -44,7 +44,7 @@ public static partial class ResultExtensions
         /// </summary>
         /// <param name="action">The action to execute when the result is not successful, receiving the errors as input.</param>
         /// <returns>The original result, unmodified.</returns>
-        public Result<TValue> DoError(Action<IEnumerable<Error>> action)
+        public Result<TValue> TapError(Action<IEnumerable<Error>> action)
         {
             if (!result.IsSuccess)
             {
