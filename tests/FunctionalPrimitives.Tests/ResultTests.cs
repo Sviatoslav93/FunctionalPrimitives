@@ -199,6 +199,26 @@ public class ResultTests
     }
 
     [Fact]
+    public void Should_UseEmptyError_WhenNoErrorsProvided()
+    {
+        var res = Result.Failure<string>();
+
+        res.IsSuccess.ShouldBeFalse();
+        res.Errors.First().ShouldBe(Error.Empty);
+    }
+
+    [Fact]
+    public void Should_ThrowException_WhenNoErrorsProvided()
+    {
+        Action action = () =>
+        {
+            Result<int> res = Array.Empty<Error>();
+        };
+
+        action.ShouldThrow<ArgumentException>();
+    }
+
+    [Fact]
     public void Should_ReturnSuccessResult_WhenTrySuccess()
     {
         var result = Result.Try(() => new object());

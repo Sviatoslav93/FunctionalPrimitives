@@ -1,4 +1,4 @@
-﻿namespace FunctionalPrimitives.Extensions;
+namespace FunctionalPrimitives.Extensions;
 
 public static partial class MaybeExtensions
 {
@@ -15,5 +15,14 @@ public static partial class MaybeExtensions
         {
             return maybe.Bind(binder);
         }
+
+        public Maybe<TFinal> SelectMany<TIntermediate, TFinal>(
+            Func<TValue, Maybe<TIntermediate>> binder,
+            Func<TValue, TIntermediate, TFinal> projector)
+        {
+            return maybe.Bind(t =>
+                binder(t).Map(i => projector(t, i)));
+        }
     }
 }
+

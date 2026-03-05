@@ -12,7 +12,10 @@ public static class Result
 
     public static Result<T> Failure<T>(Error error) => error;
 
-    public static Result<T> Failure<T>(params Error[] errors) => errors;
+    public static Result<T> Failure<T>(params Error[] errors)
+    {
+        return errors.Length == 0 ? Failure<T>(Error.Empty) : errors;
+    }
 
     /// <summary>
     /// Creates a failed <see cref="Result"/> with the specified errors.

@@ -46,6 +46,45 @@ public static partial class ResultExtensions
                 ? await onSuccess(result.Value).ConfigureAwait(false)
                 : result.Errors.ToArray();
         }
+
+        /// <summary>
+        /// Asynchronously transforms the value of a successful result using the provided asynchronous function.
+        /// If the result represents a failure, the original errors are propagated.
+        /// </summary>
+        /// <param name="onSuccess">A function that takes the value of the result and returns a task
+        /// producing a transformed result.</param>
+        /// <typeparam name="TNextValue">The type of the successful value in the output result.</typeparam>
+        /// <returns>A task representing the asynchronous operation. The task result contains the transformed
+        /// result if the input result is successful, otherwise the original errors are returned.</returns>
+        public async Task<Result<TNextValue>> SelectMany<TNextValue>(
+            Func<TValue, Task<Result<TNextValue>>> onSuccess)
+        {
+            return await result.BindAsync(onSuccess).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously projects and flattens the result value using a binder and a projector.
+        /// If any step fails, the corresponding errors are propagated.
+        /// </summary>
+        /// <param name="binder">A function that takes the source value and returns a task producing an intermediate result.</param>
+        /// <param name="projector">A function that combines the source value and the intermediate value into the final value.</param>
+        /// <typeparam name="TIntermediate">The type of the intermediate successful value.</typeparam>
+        /// <typeparam name="TNextValue">The type of the final successful value.</typeparam>
+        /// <returns>A task representing the asynchronous operation. The task result contains the projected result
+        /// if all operations are successful; otherwise, propagated errors.</returns>
+        public async Task<Result<TNextValue>> SelectMany<TIntermediate, TNextValue>(
+            Func<TValue, Task<Result<TIntermediate>>> binder,
+            Func<TValue, TIntermediate, TNextValue> projector)
+        {
+            if (!result.IsSuccess)
+            {
+                return result.Errors.ToArray();
+            }
+
+            var value = result.Value;
+            var intermediateResult = await binder(value).ConfigureAwait(false);
+            return intermediateResult.Map(i => projector(value, i));
+        }
     }
 
     /// <summary>
@@ -121,6 +160,40 @@ public static partial class ResultExtensions
         {
             var result = await task.ConfigureAwait(false);
             return await result.BindAsync(onSuccess);
+        }
+
+        /// <summary>
+        /// Asynchronously transforms the value of a successful result using the provided asynchronous function.
+        /// If the result represents a failure, the original errors are propagated.
+        /// </summary>
+        /// <param name="onSuccess">A function that takes the value of the result and returns a task
+        /// producing a transformed result.</param>
+        /// <typeparam name="TNextValue">The type of the successful value in the output result.</typeparam>
+        /// <returns>A task representing the asynchronous operation. The task result contains the transformed
+        /// result if the input result is successful, otherwise the original errors are returned.</returns>
+        public async Task<Result<TNextValue>> SelectMany<TNextValue>(
+            Func<TValue, Task<Result<TNextValue>>> onSuccess)
+        {
+            var result = await task.ConfigureAwait(false);
+            return await result.SelectMany(onSuccess).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously projects and flattens the result value using a binder and a projector.
+        /// If any step fails, the corresponding errors are propagated.
+        /// </summary>
+        /// <param name="binder">A function that takes the source value and returns a task producing an intermediate result.</param>
+        /// <param name="projector">A function that combines the source value and the intermediate value into the final value.</param>
+        /// <typeparam name="TIntermediate">The type of the intermediate successful value.</typeparam>
+        /// <typeparam name="TNextValue">The type of the final successful value.</typeparam>
+        /// <returns>A task representing the asynchronous operation. The task result contains the projected result
+        /// if all operations are successful; otherwise, propagated errors.</returns>
+        public async Task<Result<TNextValue>> SelectMany<TIntermediate, TNextValue>(
+            Func<TValue, Task<Result<TIntermediate>>> binder,
+            Func<TValue, TIntermediate, TNextValue> projector)
+        {
+            var result = await task.ConfigureAwait(false);
+            return await result.SelectMany(binder, projector).ConfigureAwait(false);
         }
     }
 }

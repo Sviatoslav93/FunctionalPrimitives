@@ -97,4 +97,31 @@ public partial class ResultExtensionsTests
         actual.IsSuccess.ShouldBeFalse();
         actual.Errors.ShouldHaveSingleItem();
     }
+
+    // select many tests
+    [Fact]
+    public void SelectMany_ShouldUseBindForSelectMany()
+    {
+        // Arrange
+        var result = Result.Success(10);
+
+        var actual = result.SelectMany(x => Result.Success(x + 5));
+
+        // Assert
+        actual.IsSuccess.ShouldBeTrue();
+        actual.Value.ShouldBe(15);
+    }
+
+    [Fact]
+    public void SelectMany_ShouldUseBindForSelectManyWithProjection()
+    {
+        // Arrange
+        var result = Result.Success(10);
+
+        var actual = result.SelectMany(x => Result.Success(x + 5), (x, y) => x + y);
+
+        // Assert
+        actual.IsSuccess.ShouldBeTrue();
+        actual.Value.ShouldBe(25);
+    }
 }

@@ -1,3 +1,4 @@
+using FunctionalPrimitives;
 using FunctionalPrimitives.Example;
 using FunctionalPrimitives.Extensions;
 
@@ -52,3 +53,18 @@ var res4 = await TestService.DivideAsync(10, 2)
 Console.WriteLine(res4);
 
 ValidationExample.Example();
+
+var arr = new[] { 1, 2, 3, 4, 5 };
+
+arr.SelectMany(x => arr.Select(y => x + y));
+
+var maybe = Maybe.Some(1);
+var maybe2 = Maybe.None<int>();
+
+var res = maybe.SelectMany(x => maybe2).Select(x => x);
+
+var rww = from x in maybe
+    from y in maybe2
+    select x;
+
+Console.WriteLine(res);

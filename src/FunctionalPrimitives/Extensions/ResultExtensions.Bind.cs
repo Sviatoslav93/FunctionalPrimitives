@@ -42,19 +42,9 @@ public static partial class ResultExtensions
         }
 
         public Result<TNext> SelectMany<TNext>(
-            Func<TValue, TNext> onSuccess)
-        {
-            return result.IsSuccess
-                ? onSuccess(result.Value)
-                : result.Errors.ToArray();
-        }
-
-        public Result<TNext> SelectMany<TNext>(
             Func<TValue, Result<TNext>> onSuccess)
         {
-            return result.IsSuccess
-                ? onSuccess(result.Value)
-                : result.Errors.ToArray();
+                return result.Bind(onSuccess);
         }
 
         public Result<TFinal> SelectMany<TIntermediate, TFinal>(
@@ -62,7 +52,7 @@ public static partial class ResultExtensions
             Func<TValue, TIntermediate, TFinal> projector)
         {
             return result.Bind(t =>
-                binder(t).Map(i => projector(t, i)));
+                binder(t).Bind(i => Result.Success(projector(t, i))));
         }
     }
 }

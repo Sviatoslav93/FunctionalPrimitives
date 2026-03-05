@@ -26,7 +26,7 @@ public sealed class Result<T> : IResult
     /// Initializes a new instance of the FunctionalPrimitives class with the specified collection of errors.
     /// </summary>
     /// <param name="errors">An array of Error objects representing the errors associated with the result. Cannot be null.</param>
-    private Result(params Error[] errors)
+    private Result(Error[] errors)
     {
         if (errors.Length == 0)
         {
@@ -75,7 +75,7 @@ public sealed class Result<T> : IResult
     /// <returns>A new <see cref="Result{T}"/> instance containing the specified error.</returns>
     public static implicit operator Result<T>(Error error)
     {
-        return new Result<T>(error);
+        return new Result<T>([error]);
     }
 
     /// <summary>
