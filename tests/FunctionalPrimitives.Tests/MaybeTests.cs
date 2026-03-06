@@ -23,6 +23,14 @@ public class MaybeTests
     }
 
     [Fact]
+    public void Default_ShouldCreateMaybeWithoutValue()
+    {
+        Maybe<int> maybe = default;
+
+        maybe.HasValue.ShouldBeFalse();
+    }
+
+    [Fact]
     public void Value_ShouldThrow_WhenHasNoValue()
     {
         var maybe = None<int>();

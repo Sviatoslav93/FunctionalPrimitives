@@ -10,8 +10,21 @@ public static class Result
     /// <returns>A successful <see cref="Result{T}"/> containing the specified value.</returns>
     public static Result<T> Success<T>(T value) => value;
 
+    /// <summary>
+    /// Creates a failed <see cref="Result{T}"/> with the specified error.
+    /// </summary>
+    /// <typeparam name="T">The type of the value that would have been contained in a successful result.</typeparam>
+    /// <param name="error">The <see cref="Error"/> that describes the failure.</param>
+    /// <returns>A failed <see cref="Result{T}"/> containing the specified error.</returns>
     public static Result<T> Failure<T>(Error error) => error;
 
+    /// <summary>
+    /// Creates a failed <see cref="Result{T}"/> with the specified errors.
+    /// If no errors are provided, a result containing <see cref="Error.Empty"/> is returned.
+    /// </summary>
+    /// <typeparam name="T">The type of the value that would have been contained in a successful result.</typeparam>
+    /// <param name="errors">One or more <see cref="Error"/> instances that describe the failure.</param>
+    /// <returns>A failed <see cref="Result{T}"/> containing the provided errors, or <see cref="Error.Empty"/> if none were supplied.</returns>
     public static Result<T> Failure<T>(params Error[] errors)
     {
         return errors.Length == 0 ? Failure<T>(Error.Empty) : errors;

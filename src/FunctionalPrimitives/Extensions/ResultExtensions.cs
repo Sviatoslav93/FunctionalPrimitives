@@ -5,7 +5,7 @@ public static partial class ResultExtensions
     extension<T>(T value)
     {
         /// <summary>
-        /// Gets wraps the value in a FunctionalPrimitives.
+        /// Gets a <see cref="Result{T}"/> wrapping this value as a successful result.
         /// </summary>
         public Result<T> AsResult => value;
     }
