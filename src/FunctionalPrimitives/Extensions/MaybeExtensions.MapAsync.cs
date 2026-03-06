@@ -2,15 +2,16 @@ namespace FunctionalPrimitives.Extensions;
 
 public static partial class MaybeExtensions
 {
-    extension<TValue>(Task<Maybe<TValue>> task)
+    extension<T>(Task<Maybe<T>> maybe)
     {
-        public async Task<Maybe<TNext>> Map<TNext>(Func<TValue, TNext> mapper)
+        public Task<Maybe<U>> MapAsync<U>(Func<T, U> projection)
         {
-            var maybe = await task.ConfigureAwait(false);
-            return maybe.Map(mapper);
+            return maybe.MatchAsync(
+                x => Some(projection(x)),
+                None<U>);
         }
 
-        public Task<Maybe<TResult>> Select<TResult>(Func<TValue, TResult> mapper)
-            => task.Map(mapper);
+        public Task<Maybe<U>> Select<U>(Func<T, U> mapper)
+            => maybe.MapAsync(mapper);
     }
 }

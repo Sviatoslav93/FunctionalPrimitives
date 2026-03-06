@@ -20,7 +20,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public void Map_ShouldReturnNone_WhenNone()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
 
         var actual = maybe.Map(x => x * 2);
 

@@ -20,7 +20,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public void Bind_ShouldReturnNone_WhenSourceIsNone()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
         var invoked = false;
 
         var actual = maybe.Bind(x =>

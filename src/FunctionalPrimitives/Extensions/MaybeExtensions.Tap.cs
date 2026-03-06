@@ -2,22 +2,26 @@ namespace FunctionalPrimitives.Extensions;
 
 public static partial class MaybeExtensions
 {
-    extension<TValue>(Maybe<TValue> maybe)
+    extension<T>(Maybe<T> maybe)
     {
-        public void Tap(Action<TValue> action)
+        public Maybe<T> Tap(Action<T> action)
         {
-            if (maybe.HasValue)
+            return maybe.Bind(value =>
             {
-                action(maybe.Value);
-            }
+                action(value);
+                return Some(value);
+            });
         }
 
-        public void TapNone(Action action)
+        public Maybe<T> TapNone(Action action)
         {
-            if (!maybe.HasValue)
-            {
-                action();
-            }
+            return maybe.Match(
+                onSome: Some,
+                onNone: () =>
+                {
+                    action();
+                    return maybe;
+                });
         }
     }
 }

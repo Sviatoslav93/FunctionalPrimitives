@@ -4,6 +4,12 @@ public readonly struct Maybe<T>
 {
     private readonly T _value;
 
+    public Maybe()
+    {
+        _value = default!;
+        HasValue = false;
+    }
+
     private Maybe(T value)
     {
         _value = value;
@@ -16,10 +22,6 @@ public readonly struct Maybe<T>
         HasValue
             ? _value!
             : throw new InvalidOperationException("No value present.");
-
-#pragma warning disable SA1204
-    public static Maybe<T> None { get; } = default;
-#pragma warning restore SA1204
 
     public static Maybe<TValue> Some<TValue>(TValue value)
     {

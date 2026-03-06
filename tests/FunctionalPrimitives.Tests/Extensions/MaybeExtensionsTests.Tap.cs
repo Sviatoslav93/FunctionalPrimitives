@@ -20,7 +20,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public void Tap_ShouldNotExecuteAction_WhenNone()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
         var invoked = false;
 
         maybe.Tap(_ => invoked = true);
@@ -31,7 +31,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public void TapNone_ShouldExecuteAction_WhenNone()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
         var invoked = false;
 
         maybe.TapNone(() => invoked = true);

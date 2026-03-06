@@ -5,10 +5,10 @@ public static partial class ResultExtensions
     /// <summary>
     /// Provides extension methods for working with <see cref="Result{T}"/> objects.
     /// </summary>
-    extension<TValue>(IEnumerable<Result<TValue>> results)
+    extension<T>(IEnumerable<Result<T>> results)
     {
         /// <summary>
-        /// Combines multiple <see cref="Result{TValue}"/> objects into a single result.
+        /// Combines multiple <see cref="Result{T}"/> objects into a single result.
         /// If all results are successful, the combined result will contain an array of their values as a successful result.
         /// If any result is a failure, the combined result will be a failure and will aggregate all encountered errors.
         /// </summary>
@@ -16,11 +16,11 @@ public static partial class ResultExtensions
         /// - If all input results are successful, it will be successful and contain an array of their values.
         /// - If any input result is a failure, it will be a failure containing all the aggregated errors.
         /// </returns>
-        public Result<TValue[]> Combine()
+        public Result<T[]> Combine()
         {
             var resultArray = results.ToArray();
             var errors = new List<Error>();
-            var values = new List<TValue>();
+            var values = new List<T>();
 
             foreach (var result in resultArray)
             {
@@ -35,7 +35,7 @@ public static partial class ResultExtensions
             }
 
             return errors.Count > 0
-                ? Result.Failure<TValue[]>(errors)
+                ? Result.Failure<T[]>(errors)
                 : Result.Success(values.ToArray());
         }
     }

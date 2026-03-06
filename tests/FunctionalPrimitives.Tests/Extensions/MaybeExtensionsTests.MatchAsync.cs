@@ -19,7 +19,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public async Task MatchAsync_ShouldInvokeOnNone_WhenNone()
     {
-        var task = Task.FromResult(Maybe<int>.None);
+        var task = Task.FromResult(None<int>());
 
         var actual = await task.MatchAsync(x => $"V:{x}", () => "NONE");
 

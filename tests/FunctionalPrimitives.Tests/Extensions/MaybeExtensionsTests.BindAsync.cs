@@ -11,7 +11,7 @@ public partial class MaybeExtensionsTests
     {
         var task = Task.FromResult(Maybe<int>.Some(2));
 
-        var actual = await task.Bind(x => Maybe<int>.Some(x + 7));
+        var actual = await task.BindAsync(x => Maybe<int>.Some(x + 7));
 
         actual.HasValue.ShouldBeTrue();
         actual.Value.ShouldBe(9);
@@ -20,10 +20,10 @@ public partial class MaybeExtensionsTests
     [Fact]
     public async Task Bind_TaskSource_ShouldReturnNone_WhenSourceIsNone()
     {
-        var task = Task.FromResult(Maybe<int>.None);
+        var task = Task.FromResult(None<int>());
         var invoked = false;
 
-        var actual = await task.Bind(x =>
+        var actual = await task.BindAsync(x =>
         {
             invoked = true;
             return Maybe<int>.Some(x + 1);

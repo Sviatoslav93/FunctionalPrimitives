@@ -2,18 +2,35 @@ namespace FunctionalPrimitives.Extensions;
 
 public static partial class MaybeExtensions
 {
-    extension<TValue>(Task<Maybe<TValue>> task)
+    extension<T>(Task<Maybe<T>> maybe)
     {
-        public async Task TapAsync(Action<TValue> action)
+        public Task<Maybe<T>> TapAsync(Action<T> action)
         {
-            var maybe = await task.ConfigureAwait(false);
-            maybe.Tap(action);
+            return maybe.BindAsync(value =>
+            {
+                action(value);
+                return Some(value);
+            });
         }
 
-        public async Task TapNoneAsync(Action action)
+        public Task<Maybe<T>> Tap(Func<T, Task> action)
         {
-            var maybe = await task.ConfigureAwait(false);
-            maybe.TapNone(action);
+            return maybe.BindAsync(value =>
+            {
+                action(value);
+                return Some(value);
+            });
+        }
+
+        public Task TapNoneAsync(Action action)
+        {
+            return maybe.MatchAsync(
+                onSome: x => Task.FromResult(Some(x)),
+                onNone: () =>
+                {
+                    action();
+                    return maybe;
+                });
         }
     }
 }

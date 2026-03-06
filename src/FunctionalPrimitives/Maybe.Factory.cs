@@ -2,15 +2,15 @@
 
 public static class Maybe
 {
-    public static Maybe<TValue> Some<TValue>(TValue value)
+    public static Maybe<T> Some<T>(T value)
     {
         return value is null
             ? throw new ArgumentNullException(nameof(value))
-            : Maybe<TValue>.Some(value);
+            : Maybe<T>.Some(value);
     }
 
-    public static Maybe<TValue> None<TValue>()
+    public static Maybe<T> None<T>()
     {
-        return Maybe<TValue>.None;
+        return default;
     }
 }

@@ -11,7 +11,7 @@ public partial class MaybeExtensionsTests
     {
         var task = Task.FromResult(Maybe<int>.Some(8));
 
-        var actual = await task.Map(x => x + 2);
+        var actual = await task.MapAsync(x => x + 2);
 
         actual.HasValue.ShouldBeTrue();
         actual.Value.ShouldBe(10);
@@ -20,9 +20,9 @@ public partial class MaybeExtensionsTests
     [Fact]
     public async Task Map_TaskSource_ShouldReturnNone_WhenNone()
     {
-        var task = Task.FromResult(Maybe<int>.None);
+        var task = Task.FromResult(None<int>());
 
-        var actual = await task.Map(x => x + 2);
+        var actual = await task.MapAsync(x => x + 2);
 
         actual.HasValue.ShouldBeFalse();
     }

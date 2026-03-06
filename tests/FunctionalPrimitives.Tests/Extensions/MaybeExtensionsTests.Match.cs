@@ -19,7 +19,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public void Match_ShouldInvokeOnNone_WhenNone()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
 
         var actual = maybe.Match(x => $"V:{x}", () => "NONE");
 

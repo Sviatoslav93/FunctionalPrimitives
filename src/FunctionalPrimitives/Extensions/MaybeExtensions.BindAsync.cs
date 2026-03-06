@@ -2,21 +2,21 @@
 
 public static partial class MaybeExtensions
 {
-    extension<TValue>(Task<Maybe<TValue>> task)
+    extension<T>(Task<Maybe<T>> maybeTask)
     {
-        public async Task<Maybe<TNext>> Bind<TNext>(Func<TValue, Maybe<TNext>> binder)
+        public async Task<Maybe<U>> BindAsync<U>(Func<T, Maybe<U>> binder)
         {
-            var maybe = await task.ConfigureAwait(false);
+            var maybe = await maybeTask.ConfigureAwait(false);
             return maybe.Bind(binder);
         }
 
-        public Task<Maybe<TNext>> SelectMany<TNext>(Func<TValue, Maybe<TNext>> binder)
-            => task.Bind(binder);
+        public Task<Maybe<U>> SelectMany<U>(Func<T, Maybe<U>> binder)
+            => maybeTask.BindAsync(binder);
 
-        public Task<Maybe<TFinal>> SelectMany<TIntermediate, TFinal>(
-            Func<TValue, Maybe<TIntermediate>> binder,
-            Func<TValue, TIntermediate, TFinal> projector)
-            => task.Bind(t =>
+        public Task<Maybe<U>> SelectMany<V, U>(
+            Func<T, Maybe<V>> binder,
+            Func<T, V, U> projector)
+            => maybeTask.BindAsync(t =>
                 binder(t).Map(i => projector(t, i)));
     }
 }

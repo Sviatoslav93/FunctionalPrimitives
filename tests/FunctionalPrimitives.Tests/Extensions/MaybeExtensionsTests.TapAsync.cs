@@ -20,7 +20,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public async Task TapAsync_ShouldNotExecuteAction_WhenNone()
     {
-        var task = Task.FromResult(Maybe<int>.None);
+        var task = Task.FromResult(None<int>());
         var invoked = false;
 
         await task.TapAsync(_ => invoked = true);
@@ -31,7 +31,7 @@ public partial class MaybeExtensionsTests
     [Fact]
     public async Task TapNoneAsync_ShouldExecuteAction_WhenNone()
     {
-        var task = Task.FromResult(Maybe<int>.None);
+        var task = Task.FromResult(None<int>());
         var invoked = false;
 
         await task.TapNoneAsync(() => invoked = true);

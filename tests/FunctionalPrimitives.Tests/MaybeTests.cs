@@ -17,7 +17,7 @@ public class MaybeTests
     [Fact]
     public void None_ShouldCreateMaybeWithoutValue()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
 
         maybe.HasValue.ShouldBeFalse();
     }
@@ -25,7 +25,7 @@ public class MaybeTests
     [Fact]
     public void Value_ShouldThrow_WhenHasNoValue()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
 
         var ex = Should.Throw<InvalidOperationException>(() => _ = maybe.Value);
         ex.Message.ShouldBe("No value present.");
@@ -40,7 +40,7 @@ public class MaybeTests
     [Fact]
     public void GetValueOrDefault_ShouldReturnProvidedDefault_WhenNone()
     {
-        var maybe = Maybe<int>.None;
+        var maybe = None<int>();
 
         var actual = maybe.GetValueOrDefault(10);
 

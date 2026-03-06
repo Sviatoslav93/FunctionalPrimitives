@@ -35,7 +35,7 @@ public class Address
             from zipValidation in zipCode
                 .Should(x => !string.IsNullOrEmpty(x), new Error("zip code is required", "zipCode"))
                 .Should(x => x.Length == 10, new Error("zip code is not correct", "zipCode"))
-            select Result.Success(None.Value);
+            select Result.Success(Unit.Value);
 
         if (validationResult.IsFailure)
         {
