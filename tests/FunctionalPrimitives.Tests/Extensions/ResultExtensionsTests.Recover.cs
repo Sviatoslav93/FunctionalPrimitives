@@ -1,4 +1,4 @@
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
 using Shouldly;
 using Xunit;
 
@@ -64,7 +64,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var error1 = new Error("Error 1", "CODE1");
         var error2 = new Error("Error 2", "CODE2");
-        var result = Result.Failure<string>(error1, error2);
+        var result = Failure<string>(error1, error2);
         IEnumerable<Error>? capturedErrors = null;
 
         // Act

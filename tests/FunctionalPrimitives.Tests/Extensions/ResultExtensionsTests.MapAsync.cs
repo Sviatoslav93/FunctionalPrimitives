@@ -1,4 +1,4 @@
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
 using Shouldly;
 using Xunit;
 
@@ -10,7 +10,7 @@ public partial class ResultExtensionsTests
     public async Task Select_TaskSource_ShouldProjectValue_When_ResultIsSuccess()
     {
         // Arrange
-        var task = Task.FromResult(Result.Success(21));
+        var task = Task.FromResult(Success(21));
 
         // Act
         var actual = await task.Select(x => x * 2);
@@ -25,7 +25,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var error = new Error("map failed");
-        var task = Task.FromResult(Result.Failure<int>(error));
+        var task = Task.FromResult(Failure<int>(error));
 
         // Act
         var actual = await task.Select(x => x * 2);
@@ -40,7 +40,7 @@ public partial class ResultExtensionsTests
     public async Task QueryExpression_TaskSource_ShouldCompileAndProject_When_SingleFromClause()
     {
         // Arrange
-        var task = Task.FromResult(Result.Success(10));
+        var task = Task.FromResult(Success(10));
 
         // Act
         var actual = await (from value in task

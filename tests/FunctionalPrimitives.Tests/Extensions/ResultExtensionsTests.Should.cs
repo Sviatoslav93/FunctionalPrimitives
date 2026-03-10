@@ -1,4 +1,4 @@
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
 using Shouldly;
 using Xunit;
 
@@ -9,7 +9,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public void Should_ValueSource_ShouldReturnSuccess_WhenPredicateIsTrue()
     {
-        var actual = 10.Should(x => x > 5, new Error("predicate failed"));
+        var actual = 10.Ensure(x => x > 5, new Error("predicate failed"));
 
         actual.IsSuccess.ShouldBeTrue();
         actual.Value.ShouldBe(10);
@@ -20,7 +20,7 @@ public partial class ResultExtensionsTests
     {
         var error = new Error("predicate failed");
 
-        var actual = 2.Should(x => x > 5, error);
+        var actual = 2.Ensure(x => x > 5, error);
 
         actual.IsSuccess.ShouldBeFalse();
         actual.Errors.ShouldContain(error);
@@ -31,7 +31,7 @@ public partial class ResultExtensionsTests
     {
         var result = Result.Success(10);
 
-        var actual = result.Should(x => x % 2 == 0, new Error("predicate failed"));
+        var actual = result.Ensure(x => x % 2 == 0, new Error("predicate failed"));
 
         actual.IsSuccess.ShouldBeTrue();
         actual.Value.ShouldBe(10);
@@ -43,7 +43,7 @@ public partial class ResultExtensionsTests
         var error = new Error("predicate failed");
         var result = Result.Success(3);
 
-        var actual = result.Should(x => x % 2 == 0, error);
+        var actual = result.Ensure(x => x % 2 == 0, error);
 
         actual.IsSuccess.ShouldBeFalse();
         actual.Errors.ShouldContain(error);
@@ -56,7 +56,7 @@ public partial class ResultExtensionsTests
         var result = Result.Failure<int>(originalError);
         var invoked = false;
 
-        var actual = result.Should(
+        var actual = result.Ensure(
             x =>
             {
                 invoked = true;

@@ -1,7 +1,7 @@
 # Functional Primitives for C#
 
 [![Build Status](https://github.com/Sviatoslav93/Result/workflows/build/badge.svg)](https://github.com/Sviatoslav93/Result/actions)
-[![NuGet](https://img.shields.io/nuget/v/Sviatoslav93.Result.svg)](https://www.nuget.org/packages/Sviatoslav93.Result/)
+[![NuGet](https://img.shields.io/nuget/v/Sviatoslav93.FunctionalPrimitives.svg)](https://www.nuget.org/packages/Sviatoslav93.FunctionalPrimitives/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A robust, functional approach to error handling in C#.
@@ -21,7 +21,7 @@ The Maybe monad is a powerful tool for handling errors, allowing for more expres
 ## Installation
 
 ```bash
-dotnet add package Sviatoslav93.Result
+dotnet add package Sviatoslav93.FunctionalPrimitives
 ```
 
 ## Quick Start
@@ -190,18 +190,18 @@ var customResult = Result.Try(
     ex => new Error($"Operation failed: {ex.Message}", "RISKY_OP_FAILED"));
 ```
 
-### Working with None Type
+### Working with Unit Type
 
 For operations that don't return values:
 
 ```csharp
-// Use None for void operations
-Result<None> SaveData(string data)
+// Use Unit for void operations
+Result<Unit> SaveData(string data)
 {
     try
     {
         File.WriteAllText("data.txt", data);
-        return None.Value;
+        return Unit.Value;
     }
     catch (Exception ex)
     {
@@ -234,18 +234,105 @@ var recovered = GetUserPreferences()
             : throw new InvalidOperationException());
 ```
 
-#### Side Effects with Do
+#### Side Effects with Tap
 
 ```csharp
 // Perform side effects without changing the result
 var result = await ProcessDataAsync(input)
-    .DoAsync(data => LogProcessedAsync(data))
-    .DoAsync(data => CacheResultAsync(data))
-    .DoErrorAsync(errors => LogErrorsAsync(errors))
+    .TapAsync(data => LogProcessedAsync(data))
+    .TapAsync(data => CacheResultAsync(data))
+    .TapErrorAsync(errors => LogErrorsAsync(errors))
     .BindAsync(data => TransformAsync(data));
 ```
 
-## Async Patterns
+### Validation Guards with Ensure
+
+```csharp
+// Validate a value before wrapping in a result
+var result = userInput
+    .Ensure(s => !string.IsNullOrWhiteSpace(s), new Error("Input is required"))
+    .Ensure(s => s.Length <= 100, new Error("Input is too long"));
+
+// Validate within a result chain
+var result = ParseInt(input)
+    .Ensure(n => n > 0, new Error("Value must be positive"))
+    .Ensure(n => n < 1000, new Error("Value must be less than 1000"));
+
+// Async validation
+var result = await GetUserAsync(id)
+    .EnsureAsync(user => IsActiveAsync(user), new Error("User is not active"));
+```
+
+### Maybe&lt;T&gt; — Optional Values
+
+`Maybe<T>` represents an optional value that is either present (`Some`) or absent (`None`).
+It replaces nullable references and null checks with a type-safe, composable alternative.
+
+```csharp
+using FunctionalPrimitives;
+using FunctionalPrimitives.Extensions.Maybe;
+
+// Creating Maybe values
+Maybe<string> some = Maybe.Some("hello");
+Maybe<string> none = Maybe.None<string>();
+
+// From nullable
+string? nullable = GetNullableString();
+Maybe<string> maybe = nullable.ToMaybe();      // class
+int? nullableInt = GetNullableInt();
+Maybe<int> maybeInt = nullableInt.ToMaybe();   // struct
+
+// Checking presence
+if (maybe.HasValue)
+{
+    Console.WriteLine(maybe.Value);
+}
+
+// Safe fallback
+string value = maybe.GetValueOrDefault("default");
+
+// GetValueOr (extension)
+string value2 = maybe.GetValueOr("fallback");
+
+// Pattern matching
+var message = maybe.Match(
+    some: v => $"Found: {v}",
+    none: () => "Nothing here");
+
+// Convert to Result
+Result<string> result = maybe.ToResult(new Error("Value not found"));
+
+// Chaining
+var result2 = GetOptionalUser(id)
+    .ToMaybe()
+    .Bind(user => GetOptionalProfile(user.Id))
+    .ToResult(new Error("User or profile not found"));
+```
+
+### JSON Serialization
+
+`Result<T>` has built-in JSON support via `System.Text.Json`. The converter is applied automatically
+through the `[JsonConverter]` attribute on `Result<T>`.
+
+```csharp
+var result = Result.Success(new User("Alice", 30));
+
+// Serialize
+string json = result.ToJson();
+// {"isSuccess":true,"value":{"name":"Alice","age":30}}
+
+Result<User> failure = new Error("Not found", "USER_NOT_FOUND");
+string failureJson = failure.ToJson();
+// {"isSuccess":false,"errors":[{"message":"Not found","code":"USER_NOT_FOUND","type":"","metadata":null}]}
+
+// Works with JsonSerializer directly
+string json2 = JsonSerializer.Serialize(result);
+
+// Works in ASP.NET Core responses — no extra configuration needed
+app.MapGet("/user/{id}", (int id) => GetUser(id)); // Result<User> returned directly
+```
+
+
 
 ### Task<Result<T>> Integration
 
@@ -279,7 +366,7 @@ Result<string> GetUserNameVerbose() => Result.Success("John Doe");
 ```csharp
 // Good: Fluent pipeline
 var result = input
-    .AsResult()
+    .ToResult()
     .Bind(Validate)
     .Bind(Transform)
     .Bind(Save)

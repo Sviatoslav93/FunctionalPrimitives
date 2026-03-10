@@ -1,4 +1,4 @@
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
 using Xunit;
 
 namespace FunctionalPrimitives.Tests.Extensions;
@@ -6,13 +6,13 @@ namespace FunctionalPrimitives.Tests.Extensions;
 public partial class ResultExtensionsTests
 {
     [Fact]
-    public void AsResult_ShouldWrapValueInResult()
+    public void ToResult_ShouldWrapValueInResult()
     {
         // Arrange
         var value = 42;
 
         // Act
-        var result = value.AsResult;
+        var result = value.ToResult();
 
         // Assert
         Assert.True(result.IsSuccess);

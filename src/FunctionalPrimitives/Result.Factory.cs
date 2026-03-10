@@ -1,5 +1,8 @@
 namespace FunctionalPrimitives;
 
+/// <summary>
+/// Provides factory and utility methods for creating and combining <see cref="Result{T}"/> instances.
+/// </summary>
 public static class Result
 {
     /// <summary>
@@ -11,12 +14,35 @@ public static class Result
     public static Result<T> Success<T>(T value) => value;
 
     /// <summary>
+    /// Creates a successful <see cref="Result{T}"/> of type <see cref="Unit"/>,
+    /// representing a successful operation that produces no value.
+    /// </summary>
+    /// <returns>A successful <see cref="Result{T}"/> containing <see cref="Unit.Value"/>.</returns>
+    public static Result<Unit> Success() => Unit.Value;
+
+    /// <summary>
     /// Creates a failed <see cref="Result{T}"/> with the specified error.
     /// </summary>
     /// <typeparam name="T">The type of the value that would have been contained in a successful result.</typeparam>
     /// <param name="error">The <see cref="Error"/> that describes the failure.</param>
     /// <returns>A failed <see cref="Result{T}"/> containing the specified error.</returns>
-    public static Result<T> Failure<T>(Error error) => error;
+    public static Result<T> Failure<T>(Error error)
+    {
+        return Failure<T>([error]);
+    }
+
+    /// <summary>
+    /// Creates a failed <see cref="Result{T}"/> with the specified errors.
+    /// If no errors are provided, a result containing <see cref="Error.Empty"/> is returned.
+    /// </summary>
+    /// <typeparam name="T">The type of the value that would have been contained in a successful result.</typeparam>
+    /// <returns>A failed <see cref="Result{T}"/> containing the provided errors, or <see cref="Error.Empty"/> if none were supplied.</returns>
+    public static Result<T> Failure<T>(IResult result)
+    {
+        return result.IsSuccess
+            ? throw new ArgumentException("Result must be a failure", nameof(result))
+            : new Result<T>(result.Errors.ToArray());
+    }
 
     /// <summary>
     /// Creates a failed <see cref="Result{T}"/> with the specified errors.
@@ -27,22 +53,12 @@ public static class Result
     /// <returns>A failed <see cref="Result{T}"/> containing the provided errors, or <see cref="Error.Empty"/> if none were supplied.</returns>
     public static Result<T> Failure<T>(params Error[] errors)
     {
-        return errors.Length == 0 ? Failure<T>(Error.Empty) : errors;
-    }
+        if (errors.Length == 0)
+        {
+            errors = [Error.Empty];
+        }
 
-    /// <summary>
-    /// Creates a failed <see cref="Result"/> with the specified errors.
-    /// </summary>
-    /// <param name="errors">An <see cref="IEnumerable{T}"/> of <see cref="Error"/> used to construct the failed result.</param>
-    /// <returns>A failed <see cref="Result"/> instance.</returns>
-    /// <exception cref="ArgumentException">Thrown when the <paramref name="errors"/> collection is empty.</exception>
-    public static Result<T> Failure<T>(IEnumerable<Error> errors)
-    {
-        ArgumentNullException.ThrowIfNull(errors);
-
-        var array = errors as Error[] ?? [.. errors];
-
-        return array;
+        return new Result<T>(errors);
     }
 
     /// <summary>
@@ -89,5 +105,26 @@ public static class Result
         {
             return errorConvert == null ? Failure<T>(new Error(ex.Message)) : Failure<T>(errorConvert.Invoke(ex));
         }
+    }
+
+    /// <summary>
+    /// Combines multiple <see cref="IResult"/> instances into a single <see cref="Result{T}"/> of type <see cref="Unit"/>.
+    /// Returns a successful result if all inputs are successful; otherwise aggregates all errors into a single failure.
+    /// </summary>
+    /// <param name="results">The results to combine.</param>
+    /// <returns>
+    /// A successful <see cref="Result{T}"/> of <see cref="Unit"/> if all <paramref name="results"/> are successful;
+    /// otherwise a failed result containing every error from every failed input.
+    /// </returns>
+    public static Result<Unit> Combine(params IResult[] results)
+    {
+        var errors = results
+            .Where(x => !x.IsSuccess)
+            .SelectMany(x => x.Errors)
+            .ToArray();
+
+        return errors.Length == 0
+            ? Success()
+            : Failure<Unit>(errors);
     }
 }

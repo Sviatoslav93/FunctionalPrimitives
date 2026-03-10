@@ -1,4 +1,4 @@
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
 using Shouldly;
 using Xunit;
 
@@ -182,7 +182,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var errors = new[] { new Error("error1"), new Error("error2") };
-        var result = Result.Failure<string>(errors);
+        var result = Failure<string>(errors);
 
         // Act
         var actualResult = await result.TapAsync(async _ =>
@@ -203,7 +203,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var result = Result.Failure<string>(error);
+        var result = Failure<string>(error);
 
         // Act
         var actualResult = await result.TapErrorAsync(async _ =>
@@ -264,7 +264,7 @@ public partial class ResultExtensionsTests
         // Arrange
         var executed = false;
         var error = new Error("test error");
-        var task = Task.FromResult(Result.Failure<string>(error));
+        var task = Task.FromResult(Failure<string>(error));
 
         // Act
         var actualResult = await task.TapErrorAsync(async _ =>
@@ -284,7 +284,7 @@ public partial class ResultExtensionsTests
     {
         // Arrange
         var executed = false;
-        var task = Task.FromResult(Result.Success("test"));
+        var task = Task.FromResult(Success("test"));
 
         // Act
         var actualResult = await task.TapErrorAsync(async _ =>
@@ -324,7 +324,7 @@ public partial class ResultExtensionsTests
         var executed = false;
         IEnumerable<Error> capturedErrors = [];
         var errors = new[] { new Error("error1"), new Error("error2"), new Error("error3") };
-        var result = Result.Failure<string>(errors);
+        var result = Failure<string>(errors);
 
         // Act
         var actualResult = await result.TapErrorAsync(async errs =>

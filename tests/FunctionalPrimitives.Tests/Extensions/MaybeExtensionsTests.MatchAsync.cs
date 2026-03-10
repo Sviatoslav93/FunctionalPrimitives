@@ -1,4 +1,4 @@
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Maybe;
 using Shouldly;
 using Xunit;
 

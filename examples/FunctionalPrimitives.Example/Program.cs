@@ -1,70 +1,104 @@
+using System.Globalization;
 using FunctionalPrimitives;
-using FunctionalPrimitives.Example;
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
+using static System.Console;
 
-// Example #1 sync and success
-var res1 = TestService.Divide(10, 2)
-    .Bind(x => TestService.Divide(x, 2))
-    .Bind(x => TestService.Divide(x, 2))
+// Result<T>
+
+// create successful result
+WriteLine("Result creation:");
+
+var r1 = 5.ToResult();
+var r2 = Success(5);
+Result<User> r3 = Success(new User("John", 20));
+WriteLine(r1);
+WriteLine(r2);
+WriteLine(r3);
+
+// create a failed result
+var r4 = Failure<int>(new Error("error 1"), new Error("error 2"));
+var r5 = Failure<int>("error 3");
+WriteLine(r4);
+WriteLine(r5);
+
+// to JSON
+WriteLine(Success(5).ToJson());
+WriteLine(Failure<int>("error-code", "some error message").ToJson());
+
+// binding several results together
+WriteLine("Result binding:");
+var res1 = Divide(10, 2)
+    .Bind(x => Divide(x, 2))
+    .Bind(x => Divide(x, 2))
     .Bind(x => Math.Round(x, 1))
-    .Bind(x => x.ToString())
-    .Match(
-        value => $"FunctionalPrimitives: {value}",
-        errors => $"Errors: {string.Join(", ", errors)}");
-Console.WriteLine(res1);
+    .Bind(x => x.ToString(CultureInfo.InvariantCulture));
 
-Console.WriteLine(new string('-', 40));
+res1.Tap(r => WriteLine($"Result: {r}"));
 
-// Example #2 sync and failed
-var res2 = TestService.Divide(10, 2)
-    .Bind(x => TestService.Divide(x, 0)) // stop execution here and return an error
-    .Bind(x => TestService.Divide(x, 2))
+// binding several results together and handling errors
+WriteLine("Result binding with errors:");
+var res2 = Divide(10, 2)
+    .Bind(x => Divide(x, 0)) // stop execution here and return an error
+    .Bind(x => Divide(x, 2))
     .Bind(x => Math.Round(x, 1))
-    .Bind(x => x.ToString())
-    .Match(
-        value => $"FunctionalPrimitives: {value}",
-        errors => $"Errors: {string.Join(", ", errors)}");
-Console.WriteLine(res2);
+    .Bind(x => x.ToString(CultureInfo.InvariantCulture));
 
-Console.WriteLine(new string('-', 40));
+res2.TapError(e => WriteLine($"Error: {e}"));
 
 // Example #3 async and success
-var res3 = await TestService.DivideAsync(10, 2)
-    .BindAsync(x => TestService.Divide(x, 2))
-    .BindAsync(x => TestService.DivideAsync(x, 2))
+var res3 = await DivideAsync(10, 2)
+    .BindAsync(x => Divide(x, 2))
+    .BindAsync(x => DivideAsync(x, 2))
     .BindAsync(x => Math.Round(x, 1))
-    .BindAsync(x => x.ToString())
+    .BindAsync(x => x.ToString(CultureInfo.InvariantCulture))
     .MatchAsync(
         value => $"FunctionalPrimitives: {value}",
         errors => $"Errors: {string.Join(", ", errors)}");
-Console.WriteLine(res3);
+WriteLine(res3);
 
-Console.WriteLine(new string('-', 40));
+WriteLine(new string('-', 40));
 
 // Example #3 async and failed
-var res4 = await TestService.DivideAsync(10, 2)
-    .BindAsync(x => TestService.Divide(x, 0))
-    .BindAsync(x => TestService.DivideAsync(x, 2))
+var res4 = await DivideAsync(10, 2)
+    .BindAsync(x => Divide(x, 0))
+    .BindAsync(x => DivideAsync(x, 2))
     .BindAsync(x => Math.Round(x, 1))
-    .BindAsync(x => x.ToString())
+    .BindAsync(x => x.ToString(CultureInfo.InvariantCulture))
     .MatchAsync(
         value => $"FunctionalPrimitives: {value}",
         errors => $"Errors: {string.Join(", ", errors)}");
-Console.WriteLine(res4);
+WriteLine(res4);
+return;
 
-ValidationExample.Example();
+Result<decimal> Divide(
+    decimal a,
+    decimal b)
+{
+    WriteLine($"Divide {a} by {b}");
+    if (b == 0)
+    {
+        return new Error("Division by zero");
+    }
 
-var arr = new[] { 1, 2, 3, 4, 5 };
+    return a / b;
+}
 
-arr.SelectMany(x => arr.Select(y => x + y));
+async Task<Result<decimal>> DivideAsync(
+    decimal a,
+    decimal b,
+    CancellationToken cancellationToken = default)
+{
+    WriteLine($"Divide {a} by {b}");
+    await Task.Delay(1000, cancellationToken);
 
-var maybe = Maybe.Some(1);
-var maybe2 = Maybe.None<int>();
+    if (b == 0)
+    {
+        return new Error("Division by zero");
+    }
 
-var res = maybe.SelectMany(x => maybe2).Select(x => x);
+    return a / b;
+}
 
-var rww = from x in maybe
-    from y in maybe2
-    select x;
-
-Console.WriteLine(res);
+#pragma warning disable SA1649
+public record User(string Name, int Age);
+#pragma warning restore SA1649

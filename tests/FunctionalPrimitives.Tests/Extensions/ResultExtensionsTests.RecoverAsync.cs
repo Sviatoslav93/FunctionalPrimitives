@@ -1,4 +1,4 @@
-using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
 using Shouldly;
 using Xunit;
 
@@ -6,13 +6,12 @@ namespace FunctionalPrimitives.Tests.Extensions
 {
     public partial class ResultExtensionsTests
     {
-        // RecoverAsync<T>(this FunctionalPrimitives<T> result, Func<IEnumerable<Error>, Task<T>> recovery)
         [Fact]
         public async Task RecoverAsync_WithAsyncRecoveryFunc_ShouldReturnOriginalValue_WhenResultIsSuccess()
         {
             // Arrange
             var originalValue = 42;
-            var result = Result.Success(originalValue);
+            var result = Success(originalValue);
             var factoryCalled = false;
 
             // Act
@@ -34,7 +33,7 @@ namespace FunctionalPrimitives.Tests.Extensions
         {
             // Arrange
             var error = new Error("Something went wrong", "ERR_500");
-            var result = Result.Failure<int>(error);
+            var result = Failure<int>(error);
             IEnumerable<Error>? capturedErrors = null;
 
             // Act
@@ -75,7 +74,6 @@ namespace FunctionalPrimitives.Tests.Extensions
             recovered.Value.ShouldBe("Recovered from 3 errors");
         }
 
-        // RecoverAsync<T>(this FunctionalPrimitives<T> result, Func<IEnumerable<Error>, Task<FunctionalPrimitives<T>>> recovery)
         [Fact]
         public async Task RecoverAsync_WithAsyncResultRecoveryFunc_ShouldReturnOriginalValue_WhenResultIsSuccess()
         {
@@ -109,7 +107,7 @@ namespace FunctionalPrimitives.Tests.Extensions
             var recovered = await result.RecoverAsync(async errors =>
             {
                 await Task.Delay(1);
-                return Result.Success("recovered value");
+                return Success("recovered value");
             });
 
             // Assert
@@ -123,13 +121,13 @@ namespace FunctionalPrimitives.Tests.Extensions
             // Arrange
             var originalError = new Error("Original error");
             var recoveryError = new Error("Recovery failed");
-            var result = Result.Failure<int>(originalError);
+            var result = Failure<int>(originalError);
 
             // Act
             var recovered = await result.RecoverAsync(async errors =>
             {
                 await Task.Delay(1);
-                return Result.Failure<int>(recoveryError);
+                return Failure<int>(recoveryError);
             });
 
             // Assert
@@ -138,13 +136,12 @@ namespace FunctionalPrimitives.Tests.Extensions
             recovered.Errors.First().ShouldBe(recoveryError);
         }
 
-        // RecoverAsync<T>(this Task<FunctionalPrimitives<T>> task, Func<IEnumerable<Error>, Task<FunctionalPrimitives<T>>> recovery)
         [Fact]
         public async Task RecoverAsync_FromTask_ShouldReturnOriginalValue_WhenResultIsSuccess()
         {
             // Arrange
             var originalValue = 123;
-            var resultTask = Task.FromResult(Result.Success(originalValue));
+            var resultTask = Task.FromResult(Success(originalValue));
             var factoryCalled = false;
 
             // Act
@@ -152,7 +149,7 @@ namespace FunctionalPrimitives.Tests.Extensions
             {
                 factoryCalled = true;
                 await Task.Delay(1);
-                return Result.Success(0);
+                return Success(0);
             });
 
             // Assert
@@ -166,13 +163,13 @@ namespace FunctionalPrimitives.Tests.Extensions
         {
             // Arrange
             var error = new Error("Async operation failed");
-            var resultTask = Task.FromResult(Result.Failure<double>(error));
+            var resultTask = Task.FromResult(Failure<double>(error));
 
             // Act
             var recovered = await resultTask.RecoverAsync(async errors =>
             {
                 await Task.Delay(1);
-                return Result.Success(3.14);
+                return Success(3.14);
             });
 
             // Assert
@@ -187,14 +184,14 @@ namespace FunctionalPrimitives.Tests.Extensions
             async Task<Result<string>> GetFailedResultAsync()
             {
                 await Task.Delay(1);
-                return Result.Failure<string>(new Error("Delayed error"));
+                return Failure<string>(new Error("Delayed error"));
             }
 
             // Act
             var recovered = await GetFailedResultAsync().RecoverAsync(async errors =>
             {
                 await Task.Delay(1);
-                return Result.Success("async recovery");
+                return Success("async recovery");
             });
 
             // Assert
@@ -202,14 +199,13 @@ namespace FunctionalPrimitives.Tests.Extensions
             recovered.Value.ShouldBe("async recovery");
         }
 
-        // RecoverAsync<T>(this Task<FunctionalPrimitives<T>> task, T fallback)
         [Fact]
         public async Task RecoverAsync_FromTaskWithFallback_ShouldReturnOriginalValue_WhenResultIsSuccess()
         {
             // Arrange
             var originalValue = "original";
             var fallbackValue = "fallback";
-            var resultTask = Task.FromResult(Result.Success(originalValue));
+            var resultTask = Task.FromResult(Success(originalValue));
 
             // Act
             var recovered = await resultTask.RecoverAsync(fallbackValue);
@@ -224,7 +220,7 @@ namespace FunctionalPrimitives.Tests.Extensions
         {
             // Arrange
             var fallbackValue = 777;
-            var resultTask = Task.FromResult(Result.Failure<int>(new Error("Task failed")));
+            var resultTask = Task.FromResult(Failure<int>(new Error("Task failed")));
 
             // Act
             var recovered = await resultTask.RecoverAsync(fallbackValue);
@@ -256,7 +252,7 @@ namespace FunctionalPrimitives.Tests.Extensions
         public async Task RecoverAsync_FromTaskWithFallback_ShouldHandleNullFallback()
         {
             // Arrange
-            var resultTask = Task.FromResult(Result.Failure<string?>(new Error("Error")));
+            var resultTask = Task.FromResult(Failure<string?>(new Error("Error")));
 
             // Act
             var recovered = await resultTask.RecoverAsync((string?)null);
@@ -276,7 +272,7 @@ namespace FunctionalPrimitives.Tests.Extensions
             var recovered = await result.RecoverAsync(async errors =>
             {
                 await Task.Delay(1);
-                return (string?)null;
+                return null;
             });
 
             // Assert

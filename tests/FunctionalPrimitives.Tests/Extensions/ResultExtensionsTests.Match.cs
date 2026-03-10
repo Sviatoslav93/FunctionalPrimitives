@@ -1,4 +1,5 @@
 ﻿using FunctionalPrimitives.Extensions;
+using FunctionalPrimitives.Extensions.Result;
 using Shouldly;
 using Xunit;
 
@@ -9,7 +10,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public void Should_MatchFailedResult()
     {
-        var result = Result.Failure<int>(new Error("test"));
+        var result = Failure<int>(new Error("test"));
 
         var value = result.Match(
             x => x,
@@ -21,7 +22,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public void Should_MatchSuccessResult()
     {
-        var result = Result.Success(1);
+        var result = Success(1);
 
         var value = result.Match(
             x => x,

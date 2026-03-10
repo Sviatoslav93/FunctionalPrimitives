@@ -1,17 +1,19 @@
-using System.Runtime.CompilerServices;
-
 namespace FunctionalPrimitives;
 
 /// <summary>
-/// Represents an error with contextual information such as a message, code,
-/// caller member name, source file path, and source line number.
+/// Represents an error with a message and optional code.
 /// </summary>
-public record Error(
+public readonly record struct Error(
     string Message,
     string Code = "",
-    [CallerMemberName] string MemberName = "not-defined",
-    [CallerFilePath] string SourceFilePath = "not-defined",
-    [CallerLineNumber] int SourceLineNumber = 0)
+    string Type = "",
+    IReadOnlyDictionary<string, object>? Metadata = null)
 {
-    public static Error Empty => new Error(string.Empty);
+    public static readonly Error Empty = new(string.Empty);
+
+    public static implicit operator Error(string message) => new(message);
+
+    public static implicit operator Error(Exception ex) => new(ex.Message, ex.GetType().Name, nameof(Exception));
+
+    public static Error FromCode(string code, string message, string type = "") => new(message, code, type);
 }

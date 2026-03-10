@@ -33,26 +33,6 @@ public class ResultTests
     }
 
     [Fact]
-    public void ImplicitConversion_FromErrorArray_CreatesFailureResult()
-    {
-        // Arrange
-        var errors = new[]
-        {
-            new Error("Test.Error1", "First error"),
-            new Error("Test.Error2", "Second error"),
-        };
-
-        // Act
-        Result<int> result = errors;
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal(2, result.Errors.Count());
-        Assert.Contains(errors[0], result.Errors);
-        Assert.Contains(errors[1], result.Errors);
-    }
-
-    [Fact]
     public void Value_WhenSuccess_ReturnsValue()
     {
         // Arrange
@@ -212,7 +192,7 @@ public class ResultTests
     {
         Action action = () =>
         {
-            Result<int> res = Array.Empty<Error>();
+            Result<int> res = new Result<int>([]);
         };
 
         action.ShouldThrow<ArgumentException>();

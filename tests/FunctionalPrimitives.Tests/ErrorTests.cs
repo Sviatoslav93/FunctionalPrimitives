@@ -13,7 +13,6 @@ public class ErrorTests
 
         var error = new Error(message);
 
-        error.MemberName.ShouldBe(nameof(Should_CreateError));
         error.Message.ShouldBe(message);
     }
 

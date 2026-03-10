@@ -1,8 +1,12 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace FunctionalPrimitives;
 
 /// <summary>
 /// Represents the result of an operation, indicating success or failure.
 /// </summary>
+[JsonConverter(typeof(ResultJsonConverterFactory))]
 public sealed class Result<T> : IResult
 {
     /// <summary>
@@ -10,23 +14,23 @@ public sealed class Result<T> : IResult
     /// </summary>
     private readonly T? _value;
 
-    private readonly Error[] _errors;
+    private readonly Error[]? _errors;
 
     /// <summary>
     /// Initializes a new instance of the FunctionalPrimitives class with the specified value.
     /// </summary>
     /// <param name="value">The value to be encapsulated by the FunctionalPrimitives instance.</param>
-    private Result(T value)
+    public Result(T value)
     {
         _value = value;
-        _errors = [];
+        _errors = null;
     }
 
     /// <summary>
     /// Initializes a new instance of the FunctionalPrimitives class with the specified collection of errors.
     /// </summary>
     /// <param name="errors">An array of Error objects representing the errors associated with the result. Cannot be null.</param>
-    private Result(Error[] errors)
+    public Result(Error[] errors)
     {
         if (errors.Length == 0)
         {
@@ -40,13 +44,16 @@ public sealed class Result<T> : IResult
     /// <summary>
     /// Gets the collection of errors encountered during the operation.
     /// </summary>
-    public IReadOnlyCollection<Error> Errors => _errors;
+    public IReadOnlyList<Error> Errors => _errors ?? [];
 
     /// <summary>
     /// Gets a value indicating whether the result represents a successful outcome.
     /// </summary>
-    public bool IsSuccess => Errors.Count == 0;
+    public bool IsSuccess => _errors is null;
 
+    /// <summary>
+    /// Gets a value indicating whether the result represents a failed outcome.
+    /// </summary>
     public bool IsFailure => !IsSuccess;
 
     /// <summary>
@@ -56,7 +63,13 @@ public sealed class Result<T> : IResult
     /// <see cref="IsSuccess"/> before accessing <see cref="Value"/> to avoid exceptions.</remarks>
     public T Value => IsSuccess
         ? _value!
-        : throw new InvalidOperationException("FunctionalPrimitives is not successful and value can not be accessed.");
+        : throw new InvalidOperationException("Cannot access Value when Result is a failure.");
+
+    /// <summary>
+    /// Gets the collection of errors contained in the result.
+    /// Is used only for optimization purposes.
+    /// </summary>
+    internal Error[] ErrorsInternal => _errors ?? [];
 
     /// <summary>
     /// Allows implicit conversion from a value of type <typeparamref name="T"/> to a <see cref="Result{T}"/> object.
@@ -79,24 +92,43 @@ public sealed class Result<T> : IResult
     }
 
     /// <summary>
-    /// Implicitly converts an array of <see cref="Error"/> objects into a <see cref="Result{T}"/> instance
-    /// representing a failure.
+    /// Defines an implicit conversion from an <see cref="Error"/> instance to a <see cref="Result{T}"/> instance.
     /// </summary>
-    /// <param name="errors">The array of <see cref="Error"/> objects that describe the failure.</param>
-    /// <returns>A <see cref="Result{T}"/> instance representing a failed result containing the provided errors.</returns>
-    public static implicit operator Result<T>(Error[] errors)
+    /// <param name="error">The error that represents a failed result.</param>
+    /// <returns>A new <see cref="Result{T}"/> instance containing the specified error.</returns>
+    public static implicit operator Result<T>(Error[] error)
     {
-        return new Result<T>(errors);
+        return new Result<T>(error);
     }
 
     /// <summary>
     /// Deconstructs the result into its value and collection of errors.
     /// </summary>
-    /// <param name="value">The value encapsulated by the result if the operation is successful; otherwise, null.</param>
-    /// <param name="errors">The collection of errors associated with the result.</param>
-    public void Deconstruct(out T? value, out IReadOnlyCollection<Error> errors)
+    /// <param name="isSuccess">Indicates whether the result represents a successful operation.</param>
+    /// <param name="result">A tuple containing the value (or <see langword="default"/> on failure) and the array of errors.</param>
+    public void Deconstruct(out bool isSuccess, out (T? Value, Error[] Errors) result)
     {
-        value = _value;
-        errors = Errors;
+        isSuccess = IsSuccess;
+        result = (Value, ErrorsInternal);
     }
+
+    /// <summary>
+    /// Returns a string representation of the result, indicating success with the value
+    /// or failure with the list of errors.
+    /// </summary>
+    /// <returns>
+    /// <c>"Success(&lt;value&gt;)"</c> when successful, or <c>"Failure(&lt;errors&gt;)"</c> when failed.
+    /// </returns>
+    public override string ToString()
+    {
+        return IsSuccess
+            ? $"Success({_value})"
+            : $"Failure({string.Join(", ", Errors)})";
+    }
+
+    /// <summary>
+    /// Serializes the result to a JSON string.
+    /// </summary>
+    /// <returns>A JSON representation of the result, including <c>isSuccess</c> and either <c>value</c> or <c>errors</c>.</returns>
+    public string ToJson() => JsonSerializer.Serialize(this);
 }
