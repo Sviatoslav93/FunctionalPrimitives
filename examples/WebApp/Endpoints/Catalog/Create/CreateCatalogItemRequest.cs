@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using FunctionalPrimitives;
-using FunctionalPrimitives.Extensions.Result;
+using FunctionalPrimitives.Monads.Results;
+using FunctionalPrimitives.Monads.Results.Extensions;
 using WebApp.Domain.Catalog;
 using WebApp.Services;
 

@@ -1,4 +1,7 @@
-﻿using WebApp.Extensions.Http;
+﻿using FunctionalPrimitives.Monads.Results.Extensions;
+using WebApp.Domain.Catalog.Values;
+using WebApp.Endpoints.Catalog.Dtos;
+using WebApp.Extensions.Http;
 using WebApp.Services;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
@@ -8,21 +11,21 @@ public static class LookupCatalogItemEndpoint
 {
     public static void Map(RouteGroupBuilder group)
     {
-        group.MapGet("/{id:long}", Handle)
+        group.MapGet("/{sku}", Handle)
             .WithName("lookup-item")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<CatalogItemDto>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
     private static Task<IResult> Handle(
-        long id,
+        string sku,
         CatalogService catalogService,
         CancellationToken cancellationToken)
     {
-        return catalogService
-            .LookupCatalogItem(id, cancellationToken)
+        return Sku.Create(sku)
+            .BindAsync(x => catalogService.LookupCatalogItem(x, cancellationToken))
             .ToHttpResultAsync();
     }
 }

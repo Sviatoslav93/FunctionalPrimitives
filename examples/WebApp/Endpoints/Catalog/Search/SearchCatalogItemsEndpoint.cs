@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebApp.Endpoints.Catalog.Dtos;
 using WebApp.Services;
+using WebApp.Shared;
 
 namespace WebApp.Endpoints.Catalog.Search;
 
@@ -9,11 +11,11 @@ public static class SearchCatalogItemsEndpoint
     {
         group.MapPost("/search", Handle)
             .WithName("search-items")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<PagedResponse<CatalogItemDto>>()
             .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
 
-    private static async Task<IResult> Handle(
+    private static async Task<PagedResponse<CatalogItemDto>> Handle(
         [FromBody] SearchCatalogItemsRequest request,
         CatalogService catalogService,
         CancellationToken cancellationToken)
@@ -31,6 +33,6 @@ public static class SearchCatalogItemsEndpoint
 
         var items = await catalogService.SearchCatalogItems(query, cancellationToken);
 
-        return Results.Ok(items);
+        return items;
     }
 }

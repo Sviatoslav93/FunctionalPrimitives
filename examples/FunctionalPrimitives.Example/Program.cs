@@ -1,6 +1,7 @@
 using System.Globalization;
-using FunctionalPrimitives;
-using FunctionalPrimitives.Extensions.Result;
+using FunctionalPrimitives.Errors;
+using FunctionalPrimitives.Monads.Results;
+using FunctionalPrimitives.Monads.Results.Extensions;
 using static System.Console;
 
 // Result<T>
@@ -77,7 +78,7 @@ Result<decimal> Divide(
     WriteLine($"Divide {a} by {b}");
     if (b == 0)
     {
-        return new Error("Division by zero");
+        return new Error("Division by zero", "code-002");
     }
 
     return a / b;

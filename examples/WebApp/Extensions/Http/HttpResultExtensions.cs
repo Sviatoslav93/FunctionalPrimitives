@@ -1,5 +1,5 @@
-﻿using FunctionalPrimitives;
-using FunctionalPrimitives.Extensions.Result;
+﻿using FunctionalPrimitives.Monads.Results;
+using FunctionalPrimitives.Monads.Results.Extensions;
 using HttpResult = Microsoft.AspNetCore.Http.Results;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 

@@ -1,11 +1,11 @@
 ﻿namespace WebApp.Shared;
 
-public static class ErrorTypes
-{
-    public const string Failure = "failure";
-    public const string NotFound = "not-found";
-    public const string Unauthorized = "unauthorized";
-    public const string Forbidden = "forbidden";
-    public const string Validation = "validation";
-    public const string Conflict = "conflict";
-}
+// public static class ErrorTypes
+// {
+//     public const string Failure = "failure";
+//     public const string NotFoundError = "not-found";
+//     public const string UnauthorizedError = "unauthorized";
+//     public const string ForbiddenError = "forbidden";
+//     public const string ValidationError = "validation";
+//     public const string ConflictError = "conflict";
+// }

@@ -1,6 +1,7 @@
 ﻿using FunctionalPrimitives;
-using FunctionalPrimitives.Extensions.Maybe;
-using FunctionalPrimitives.Extensions.Result;
+using FunctionalPrimitives.Monads.Options.Extensions;
+using FunctionalPrimitives.Monads.Results;
+using FunctionalPrimitives.Monads.Results.Extensions;
 using Microsoft.EntityFrameworkCore;
 using WebApp.DataBase;
 using WebApp.Domain.Catalog;
@@ -15,25 +16,18 @@ namespace WebApp.Services;
 public class CatalogService(
     AppDbContext db)
 {
-    public async Task<Result<CatalogItemDto>> LookupCatalogItem(long id, CancellationToken cancellationToken = default)
+    public async Task<Result<CatalogItemDto>> LookupCatalogItem(Sku sku, CancellationToken cancellationToken = default)
     {
         var item = await db.CatalogItems
             .AsQueryable()
-            .Where(i => i.Id == id)
-            .Select(i => new CatalogItemDto()
-            {
-                Sku = i.Sku.Value,
-                Price = i.Price,
-                Description = i.Description,
-                Available = i.Available,
-                Status = i.Status,
-            })
+            .Where(i => i.Sku == sku)
+            .Select(i => i.ToDto())
             .FirstOrDefaultAsync(cancellationToken);
 
-        return item.ToResult(CatalogErrors.CatalogItemNotFound(id));
+        return item.ToResult(CatalogErrors.CatalogItemNotFound(sku));
     }
 
-    public async Task<PagedResponse<CatalogItem>> SearchCatalogItems(
+    public async Task<PagedResponse<CatalogItemDto>> SearchCatalogItems(
         SearchCatalogItemQuery request,
         CancellationToken cancellationToken = default)
     {
@@ -70,11 +64,12 @@ public class CatalogService(
         var items = await query
             .ApplySorting(typeof(CatalogItem), request)
             .ApplyPaging(request)
+            .Select(i => i.ToDto())
             .ToArrayAsync(cancellationToken);
 
         var count = await db.CatalogItems.CountAsync(cancellationToken);
 
-        return new PagedResponse<CatalogItem>
+        return new PagedResponse<CatalogItemDto>
         {
             Count = count,
             Items = items,
@@ -134,14 +129,14 @@ public class CatalogService(
     {
         var item = await db.CatalogItems.FirstOrDefaultAsync(i => i.Sku == sku, cancellationToken);
 
-        return item.ToResult(new Error("catalog item not found", "catalog-item-not-found"));
+        return item.ToResult(CatalogErrors.ItemNotFound(sku));
     }
 
     private async Task<Result<Unit>> CheckCatalogItemNotExists(Sku sku, CancellationToken cancellationToken = default)
     {
         var exist = await db.CatalogItems.AnyAsync(i => i.Sku == sku, cancellationToken);
 
-        return exist ? Failure<Unit>(CatalogErrors.ItemAlreadyExists(sku.Value)) : Unit.Value;
+        return exist ? Failure<Unit>(CatalogErrors.ItemAlreadyExists(sku)) : Unit.Value;
     }
 
     public record SearchCatalogItemQuery(

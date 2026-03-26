@@ -4,6 +4,8 @@ namespace WebApp.Endpoints.Catalog.Dtos;
 
 public class CatalogItemDto
 {
+    public long Id { get; set; }
+
     public required string Sku { get; init; }
 
     public required decimal Price { get; init; }

@@ -1,2 +1,2 @@
-﻿global using static FunctionalPrimitives.Maybe;
-global using static FunctionalPrimitives.Result;
+﻿global using static FunctionalPrimitives.Monads.Options.Option;
+global using static FunctionalPrimitives.Monads.Results.Result;

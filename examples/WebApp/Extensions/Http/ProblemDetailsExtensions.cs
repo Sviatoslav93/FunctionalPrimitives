@@ -1,4 +1,4 @@
-﻿using FunctionalPrimitives;
+﻿using FunctionalPrimitives.Errors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Extensions.Http;
@@ -11,11 +11,26 @@ public static class ProblemDetailsExtensions
         {
             var errorsArr = errors.ToArray();
 
+            var firstError = errorsArr.FirstOrDefault();
+            var statusCode = firstError switch
+            {
+                ConflictError => StatusCodes.Status409Conflict,
+                ForbiddenError => StatusCodes.Status403Forbidden,
+                InvalidStateError => StatusCodes.Status400BadRequest,
+                NotFoundError => StatusCodes.Status404NotFound,
+                TimeoutError => StatusCodes.Status408RequestTimeout,
+                UnauthorizedError => StatusCodes.Status401Unauthorized,
+                UnexpectedError => StatusCodes.Status500InternalServerError,
+                ValidationError => StatusCodes.Status400BadRequest,
+                _ => StatusCodes.Status500InternalServerError,
+            };
+
+            var isMultipleErrors = errorsArr.Length > 1;
             var problem = new ProblemDetails
             {
-                Status = StatusCodes.Status404NotFound,
-                Title = "An error occurred",
-                Detail = errorsArr.Length > 0 ? errorsArr[0].Message : string.Empty,
+                Status = statusCode,
+                Title = isMultipleErrors ? "Multiple errors occurred" : firstError?.Message,
+                Detail = isMultipleErrors ? string.Empty : firstError?.Message,
                 Extensions =
                 {
                     ["errors"] = errorsArr

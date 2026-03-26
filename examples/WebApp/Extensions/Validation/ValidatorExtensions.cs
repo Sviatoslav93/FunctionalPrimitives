@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FunctionalPrimitives;
+using FunctionalPrimitives.Monads.Results;
 
 namespace WebApp.Extensions.Validation;
 

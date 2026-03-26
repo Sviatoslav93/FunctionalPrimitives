@@ -1,6 +1,8 @@
 ﻿using FunctionalPrimitives;
-using FunctionalPrimitives.Extensions.Maybe;
-using FunctionalPrimitives.Extensions.Result;
+using FunctionalPrimitives.Monads.Options;
+using FunctionalPrimitives.Monads.Options.Extensions;
+using FunctionalPrimitives.Monads.Results;
+using FunctionalPrimitives.Monads.Results.Extensions;
 using WebApp.Domain.Base;
 using WebApp.Domain.Catalog.Errors;
 using WebApp.Domain.Catalog.Values;
@@ -52,8 +54,8 @@ public class CatalogItem : AuditableEntity<long>
 
     public Result<Unit> Edit(
         decimal price,
-        Maybe<decimal> available,
-        Maybe<string> description)
+        Option<decimal> available,
+        Option<string> description)
     {
         return from newPrice in ValidatePrice(price)
             from newAvailable in available.Match(ValidateAvailable, () => Success(Available))

@@ -1,40 +1,44 @@
-﻿using FunctionalPrimitives;
-using FunctionalPrimitives.Extensions.Errors;
-using WebApp.Shared;
+﻿using FunctionalPrimitives.Errors;
+using FunctionalPrimitives.Errors.Extensions;
+using WebApp.Domain.Catalog.Values;
 
 namespace WebApp.Domain.Catalog.Errors;
 
 public static class CatalogErrors
 {
     public static Error PriceMustBePositive() =>
-        Error.FromCode("catalog-item.invalid-price", "Invalid price", ErrorTypes.Validation);
+        new ValidationError("Price must be positive", "catalog-item.price-must-be-positive");
 
     public static Error PriceTooLarge() =>
-        Error.FromCode("catalog-item.price-too-large", "Price cannot exceed 1000000", ErrorTypes.Validation);
+        new ValidationError("Price cannot exceed 1000000", "catalog-item.price-too-large");
 
     public static Error AvailableMustBePositive() =>
-        Error.FromCode("catalog-item.available-must-be-positive", "Available quantity must be positive", ErrorTypes.Validation);
+        new ValidationError("Available quantity must be positive", "catalog-item.available-must-be-positive");
 
     public static Error ItemCanNotBePublished() =>
-        Error.FromCode("catalog-item.can-not-be-published", "Item can not be published", ErrorTypes.Forbidden);
+        new ValidationError("Item can not be published", "catalog-item.can-not-be-published");
 
     public static Error NameCannotBeEmpty() =>
-        Error.FromCode("catalog-item.name-cannot-be-empty", "Name cannot be empty", ErrorTypes.Validation);
+        new ValidationError("Name cannot be empty", "catalog-item.name-cannot-be-empty");
 
-    public static Error CatalogItemNotFound(long id) =>
-        Error.FromCode("catalog-item.not-found", "Catalog item not found", ErrorTypes.NotFound)
-            .WithMetadata("id", id);
+    public static Error CatalogItemNotFound(Sku sku) =>
+        new NotFoundError("Catalog item not found", "catalog-item.not-found")
+            .WithMetadata("sku", sku);
 
     public static Error SkuMismatch() =>
-        Error.FromCode("catalog-item.sku-mismatch", "SKU mismatch", ErrorTypes.Failure);
+        new ValidationError("SKU mismatch", "catalog-item.sku-mismatch");
 
-    public static Error ItemAlreadyExists(string sku) =>
-        Error.FromCode("catalog-item.already-exists", "Item already exists", ErrorTypes.Conflict)
+    public static Error ItemAlreadyExists(Sku sku) =>
+        new ConflictError("Item already exists", "catalog-item.already-exists")
             .WithMetadata("sku", sku);
 
     public static Error SkuEmpty() =>
-        Error.FromCode("catalog-item.sku-empty", "SKU cannot be empty", ErrorTypes.Validation);
+        new ValidationError("SKU cannot be empty", "catalog-item.sku-empty");
 
     public static Error SkuTooLong() =>
-        Error.FromCode("catalog-item.sku-too-long", "SKU cannot be longer than 32 characters", ErrorTypes.Validation);
+        new ValidationError("SKU cannot be longer than 32 characters", "catalog-item.sku-too-long");
+
+    public static Error ItemNotFound(Sku sku) =>
+        new NotFoundError("Catalog item not found", "catalog-item.not-found")
+            .WithMetadata("sku", sku);
 }

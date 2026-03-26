@@ -1,4 +1,4 @@
-﻿using FunctionalPrimitives.Extensions.Result;
+﻿using FunctionalPrimitives.Monads.Results.Extensions;
 using WebApp.Domain.Catalog.Values;
 using WebApp.Extensions.Http;
 using WebApp.Services;

@@ -1,4 +1,4 @@
-﻿using FunctionalPrimitives.Extensions.Result;
+﻿using FunctionalPrimitives.Monads.Results.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Extensions.Http;
 using WebApp.Filters;
