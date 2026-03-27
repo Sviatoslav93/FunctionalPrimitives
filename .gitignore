@@ -90,3 +90,12 @@ fabric.properties
 
 # rider
 *.DotSettings.user
+
+# SQLite local runtime data
+*.sqlite
+*.db
+*.db-wal
+*.db-shm
+
+# WebApp local DB
+examples/WebApp/Db/*.db

@@ -32,6 +32,9 @@ dotnet_diagnostic.SA1601.severity = none
 # SA1313: Parameter names must begin with lower case letter.
 dotnet_diagnostic.SA1313.severity = none
 
+# SA1314: Parameter name must start from T
+dotnet_diagnostic.SA1314.severity = none
+
 # SA1009: Closing parenthesis should be followed by a space.
 dotnet_diagnostic.SA1009.severity = none
 

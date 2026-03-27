@@ -1,0 +1,290 @@
+using FunctionalPrimitives.Errors;
+using FunctionalPrimitives.Monads.Results;
+using FunctionalPrimitives.Monads.Results.Extensions;
+using Shouldly;
+using Xunit;
+
+namespace FunctionalPrimitives.Tests.Monads.Results.Extensions
+{
+    public partial class ResultExtensionsTests
+    {
+        [Fact]
+        public async Task RecoverAsync_WithAsyncRecoveryFunc_ShouldReturnOriginalValue_WhenResultIsSuccess()
+        {
+            // Arrange
+            var originalValue = 42;
+            var result = Success(originalValue);
+            var factoryCalled = false;
+
+            // Act
+            var recovered = await result.RecoverAsync(async _ =>
+            {
+                factoryCalled = true;
+                await Task.Delay(1);
+                return 0;
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe(originalValue);
+            factoryCalled.ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task RecoverAsync_WithAsyncRecoveryFunc_ShouldInvokeRecoveryAndReturnValue_WhenResultIsFailure()
+        {
+            // Arrange
+            var error = new Error("Something went wrong", "ERR_500");
+            var result = Failure<int>(error);
+            IEnumerable<Error>? capturedErrors = null;
+
+            // Act
+            var recovered = await result.RecoverAsync(async errors =>
+            {
+                capturedErrors = errors.ToList();
+                await Task.Delay(1);
+                return 99;
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe(99);
+
+            if (capturedErrors != null)
+            {
+                var enumerable = capturedErrors as Error[] ?? capturedErrors.ToArray();
+                enumerable.ShouldNotBeNull();
+                enumerable.Count().ShouldBe(1);
+                enumerable.First().ShouldBe(error);
+            }
+        }
+
+        [Fact]
+        public async Task RecoverAsync_WithAsyncRecoveryFunc_ShouldProvideMultipleErrors()
+        {
+            // Arrange
+            var error1 = new Error("Error 1", "CODE1");
+            var error2 = new Error("Error 2", "CODE2");
+            var error3 = new Error("Error 3", "CODE3");
+            var result = Result.Failure<string>(error1, error2, error3);
+
+            // Act
+            var recovered = await result.RecoverAsync(async errors =>
+            {
+                await Task.Delay(1);
+                var errorList = errors.ToList();
+                return $"Recovered from {errorList.Count} errors";
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe("Recovered from 3 errors");
+        }
+
+        [Fact]
+        public async Task RecoverAsync_WithAsyncResultRecoveryFunc_ShouldReturnOriginalValue_WhenResultIsSuccess()
+        {
+            // Arrange
+            var originalValue = "success";
+            var result = Result.Success(originalValue);
+            var factoryCalled = false;
+
+            // Act
+            var recovered = await result.RecoverAsync(async _ =>
+            {
+                factoryCalled = true;
+                await Task.Delay(1);
+                return Result.Success("fallback");
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe(originalValue);
+            factoryCalled.ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task RecoverAsync_WithAsyncResultRecoveryFunc_ShouldInvokeRecoveryAndReturnResult_WhenResultIsFailure()
+        {
+            // Arrange
+            var error = new Error("Database error");
+            var result = Result.Failure<string>(error);
+
+            // Act
+            var recovered = await result.RecoverAsync(async _ =>
+            {
+                await Task.Delay(1);
+                return Success("recovered value");
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe("recovered value");
+        }
+
+        [Fact]
+        public async Task RecoverAsync_WithAsyncResultRecoveryFunc_ShouldReturnFailure_WhenRecoveryFails()
+        {
+            // Arrange
+            var originalError = new Error("Original error");
+            var recoveryError = new Error("Recovery failed");
+            var result = Failure<int>(originalError);
+
+            // Act
+            var recovered = await result.RecoverAsync(async _ =>
+            {
+                await Task.Delay(1);
+                return Failure<int>(recoveryError);
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeFalse();
+            recovered.Errors.Count().ShouldBe(1);
+            recovered.Errors.First().ShouldBe(recoveryError);
+        }
+
+        [Fact]
+        public async Task RecoverAsync_FromTask_ShouldReturnOriginalValue_WhenResultIsSuccess()
+        {
+            // Arrange
+            var originalValue = 123;
+            var resultTask = Task.FromResult(Success(originalValue));
+            var factoryCalled = false;
+
+            // Act
+            var recovered = await resultTask.RecoverAsync(async _ =>
+            {
+                factoryCalled = true;
+                await Task.Delay(1);
+                return Success(0);
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe(originalValue);
+            factoryCalled.ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task RecoverAsync_FromTask_ShouldInvokeRecoveryAndReturnResult_WhenResultIsFailure()
+        {
+            // Arrange
+            var error = new Error("Async operation failed");
+            var resultTask = Task.FromResult(Failure<double>(error));
+
+            // Act
+            var recovered = await resultTask.RecoverAsync(async _ =>
+            {
+                await Task.Delay(1);
+                return Success(3.14);
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe(3.14);
+        }
+
+        [Fact]
+        public async Task RecoverAsync_FromTask_ShouldHandleAsyncTask()
+        {
+            // Arrange
+            async Task<Result<string>> GetFailedResultAsync()
+            {
+                await Task.Delay(1);
+                return Failure<string>(new Error("Delayed error"));
+            }
+
+            // Act
+            var recovered = await GetFailedResultAsync().RecoverAsync(async _ =>
+            {
+                await Task.Delay(1);
+                return Success("async recovery");
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe("async recovery");
+        }
+
+        [Fact]
+        public async Task RecoverAsync_FromTaskWithFallback_ShouldReturnOriginalValue_WhenResultIsSuccess()
+        {
+            // Arrange
+            var originalValue = "original";
+            var fallbackValue = "fallback";
+            var resultTask = Task.FromResult(Success(originalValue));
+
+            // Act
+            var recovered = await resultTask.RecoverAsync(fallbackValue);
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe(originalValue);
+        }
+
+        [Fact]
+        public async Task RecoverAsync_FromTaskWithFallback_ShouldReturnFallbackValue_WhenResultIsFailure()
+        {
+            // Arrange
+            var fallbackValue = 777;
+            var resultTask = Task.FromResult(Failure<int>(new Error("Task failed")));
+
+            // Act
+            var recovered = await resultTask.RecoverAsync(fallbackValue);
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe(fallbackValue);
+        }
+
+        [Fact]
+        public async Task RecoverAsync_FromTaskWithFallback_ShouldHandleAsyncTask()
+        {
+            // Arrange
+            async Task<Result<string>> GetFailedResultAsync()
+            {
+                await Task.Delay(1);
+                return Result.Failure<string>(new Error("Async error"));
+            }
+
+            // Act
+            var recovered = await GetFailedResultAsync().RecoverAsync("recovered");
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBe("recovered");
+        }
+
+        [Fact]
+        public async Task RecoverAsync_FromTaskWithFallback_ShouldHandleNullFallback()
+        {
+            // Arrange
+            var resultTask = Task.FromResult(Failure<string?>(new Error("Error")));
+
+            // Act
+            var recovered = await resultTask.RecoverAsync((string?)null);
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task RecoverAsync_WithAsyncRecoveryFunc_ShouldHandleNullReturnValue()
+        {
+            // Arrange
+            var result = Result.Failure<string?>(new Error("Error"));
+
+            // Act
+            var recovered = await result.RecoverAsync(async _ =>
+            {
+                await Task.Delay(1);
+                return null;
+            });
+
+            // Assert
+            recovered.IsSuccess.ShouldBeTrue();
+            recovered.Value.ShouldBeNull();
+        }
+    }
+}

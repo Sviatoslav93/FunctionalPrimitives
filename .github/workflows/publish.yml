@@ -2,6 +2,7 @@
 on:
     workflow_run:
         workflows: ["build"]
+        branches: [main]
         types:
             - completed
 
@@ -9,14 +10,23 @@ jobs:
     publish:
         name: build, pack & publish
         runs-on: windows-latest
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        permissions:
+            contents: read
         steps:
             - uses: actions/checkout@v4
             - name: Setup dotnet
               uses: actions/setup-dotnet@v4
               with:
-                  dotnet-version: 9.0.x
+                  global-json-file: global.json
+
+            - name: Restore dependencies
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build -c Release --no-restore
 
             - name: Package
-              run: dotnet pack -c Release src/Result/Result.csproj -o .\artifacts
+              run: dotnet pack -c Release src/FunctionalPrimitives/FunctionalPrimitives.csproj -o .\artifacts --no-build --no-restore
             - name: Publish
               run: dotnet nuget push .\artifacts\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
