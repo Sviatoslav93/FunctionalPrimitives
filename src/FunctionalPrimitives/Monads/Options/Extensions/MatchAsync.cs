@@ -2,53 +2,48 @@ namespace FunctionalPrimitives.Monads.Options.Extensions;
 
 public static partial class OptionExtensions
 {
-    extension<T>(Task<Option<T>> optionTask)
+    /// <summary>
+    /// Asynchronously matches the state of the awaited <see cref="Option{T}"/> and executes
+    /// the appropriate function based on whether a value is present.
+    /// </summary>
+    public static async Task<U> MatchAsync<T, U>(
+        this Task<Option<T>> optionTask,
+        Func<T, U> onSome,
+        Func<U> onNone)
     {
-        /// <summary>
-        /// Asynchronously matches the state of the awaited <see cref="Option{T}"/> and executes
-        /// the appropriate function based on whether a value is present.
-        /// </summary>
-        /// <typeparam name="U">The type of the result returned by the provided functions.</typeparam>
-        /// <param name="onSome">A function to execute if a value is present. Takes the value as an argument and returns a result of type <typeparamref name="U"/>.</param>
-        /// <param name="onNone">A function to execute if no value is present. Returns a result of type <typeparamref name="U"/>.</param>
-        /// <returns>
-        /// A <see cref="Task{T}"/> that resolves to the result of invoking either <paramref name="onSome"/>
-        /// or <paramref name="onNone"/>, depending on the state of the awaited <see cref="Option{T}"/>.
-        /// </returns>
-        public async Task<U> MatchAsync<U>(
-            Func<T, U> onSome,
-            Func<U> onNone)
-        {
-            return (await optionTask.ConfigureAwait(false)).Match(onSome, onNone);
-        }
+        return (await optionTask.ConfigureAwait(false)).Match(onSome, onNone);
+    }
 
-        public async Task<U> MatchAsync<U>(
-            Func<T, Task<U>> onSome,
-            Func<U> onNone)
-        {
-            var maybe = await optionTask.ConfigureAwait(false);
-            return maybe.HasValue
+    public static async Task<U> MatchAsync<T, U>(
+        this Task<Option<T>> optionTask,
+        Func<T, Task<U>> onSome,
+        Func<U> onNone)
+    {
+        var maybe = await optionTask.ConfigureAwait(false);
+        return maybe.HasValue
             ? await onSome(maybe.Value).ConfigureAwait(false)
             : onNone();
-        }
+    }
 
-        public async Task<U> MatchAsync<U>(
-            Func<T, U> onSome,
-            Func<Task<U>> onNone)
-        {
-            var maybe = await optionTask.ConfigureAwait(false);
-            return maybe.HasValue
+    public static async Task<U> MatchAsync<T, U>(
+        this Task<Option<T>> optionTask,
+        Func<T, U> onSome,
+        Func<Task<U>> onNone)
+    {
+        var maybe = await optionTask.ConfigureAwait(false);
+        return maybe.HasValue
             ? onSome(maybe.Value)
             : await onNone().ConfigureAwait(false);
-        }
-        public async Task<U> MatchAsync<U>(
-                    Func<T, Task<U>> onSome,
-                    Func<Task<U>> onNone)
-        {
-            var maybe = await optionTask.ConfigureAwait(false);
-            return maybe.HasValue
+    }
+
+    public static async Task<U> MatchAsync<T, U>(
+        this Task<Option<T>> optionTask,
+        Func<T, Task<U>> onSome,
+        Func<Task<U>> onNone)
+    {
+        var maybe = await optionTask.ConfigureAwait(false);
+        return maybe.HasValue
             ? await onSome(maybe.Value).ConfigureAwait(false)
             : await onNone().ConfigureAwait(false);
-        }
     }
 }
