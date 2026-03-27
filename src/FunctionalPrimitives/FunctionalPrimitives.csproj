@@ -10,12 +10,13 @@
     </ItemGroup>
 
     <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
         <PackageId>Sviatoslav93.FunctionalPrimitives</PackageId>
         <Version>1.0.0</Version>
         <Authors>Sviatoslav Kindrat</Authors>
-        <PackageTags>Result, Results, Errors, Maybe, Functional</PackageTags>
+        <PackageTags>Result, Error, Option, Functional</PackageTags>
         <RepositoryUrl>https://github.com/Sviatoslav93/Result</RepositoryUrl>
-        <PackageProjectUrl>https://github.com/Sviatoslav93/Result</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/Sviatoslav93/FunctionalPrimitives</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>The Result is an alternative to exception-based error handling.</Description>
         <RepositoryType>git</RepositoryType>
