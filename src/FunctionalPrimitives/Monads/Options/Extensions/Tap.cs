@@ -1,6 +1,6 @@
 namespace FunctionalPrimitives.Monads.Options.Extensions;
 
-public static partial class MaybeExtensions
+public static partial class OptionExtensions
 {
     extension<T>(Option<T> option)
     {
@@ -11,11 +11,13 @@ public static partial class MaybeExtensions
         /// <returns>The original <see cref="Option{T}"/>, unchanged.</returns>
         public Option<T> Tap(Action<T> action)
         {
-            return option.Bind(value =>
-            {
-                action(value);
-                return Some(value);
-            });
+            return option.Match(
+                value =>
+                {
+                    action(value);
+                    return Some(value);
+                },
+                () => option);
         }
 
         /// <summary>
@@ -26,8 +28,8 @@ public static partial class MaybeExtensions
         public Option<T> TapNone(Action action)
         {
             return option.Match(
-                onSome: Some,
-                onNone: () =>
+                Some,
+                () =>
                 {
                     action();
                     return option;

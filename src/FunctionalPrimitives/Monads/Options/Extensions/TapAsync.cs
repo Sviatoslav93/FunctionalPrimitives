@@ -1,8 +1,8 @@
 namespace FunctionalPrimitives.Monads.Options.Extensions;
 
-public static partial class MaybeExtensions
+public static partial class OptionExtensions
 {
-    extension<T>(Task<Option<T>> maybe)
+    extension<T>(Task<Option<T>> optionTask)
     {
         /// <summary>
         /// Asynchronously executes the specified synchronous action on the contained value of the awaited
@@ -14,11 +14,13 @@ public static partial class MaybeExtensions
         /// </returns>
         public Task<Option<T>> TapAsync(Action<T> action)
         {
-            return maybe.BindAsync(value =>
-            {
-                action(value);
-                return Some(value);
-            });
+            return optionTask.MatchAsync(
+                value =>
+                {
+                    action(value);
+                    return Some(value);
+                },
+                () => optionTask);
         }
 
         /// <summary>
@@ -31,11 +33,13 @@ public static partial class MaybeExtensions
         /// </returns>
         public Task<Option<T>> Tap(Func<T, Task> action)
         {
-            return maybe.BindAsync(value =>
-            {
-                action(value);
-                return Some(value);
-            });
+            return optionTask.MatchAsync(
+                async value =>
+                {
+                    await action(value).ConfigureAwait(false);
+                    return Some(value);
+                },
+                () => optionTask);
         }
 
         /// <summary>
@@ -44,16 +48,35 @@ public static partial class MaybeExtensions
         /// </summary>
         /// <param name="action">The action to invoke when no value is present.</param>
         /// <returns>
-        /// A <see cref="Task"/> that resolves to the original <see cref="Option{T}"/>, unchanged.
+        /// A <see cref="Task{T}"/> that resolves to the original <see cref="Option{T}"/>, unchanged.
         /// </returns>
-        public Task TapNoneAsync(Action action)
+        public Task<Option<T>> TapNoneAsync(Action action)
         {
-            return maybe.MatchAsync(
-                onSome: x => Task.FromResult(Some(x)),
-                onNone: () =>
+            return optionTask.MatchAsync(
+                _ => optionTask,
+                () =>
                 {
                     action();
-                    return maybe;
+                    return optionTask;
+                });
+        }
+
+        /// <summary>
+        /// Asynchronously executes the specified asynchronous action when the awaited <see cref="Option{T}"/> has no value,
+        /// then returns the original <see cref="Option{T}"/>.
+        /// </summary>
+        /// <param name="action">The asynchronous action to invoke when no value is present.</param>
+        /// <returns>
+        /// A <see cref="Task{T}"/> that resolves to the original <see cref="Option{T}"/>, unchanged.
+        /// </returns>
+        public Task<Option<T>> TapNoneAsync(Func<Task> action)
+        {
+            return optionTask.MatchAsync(
+                _ => optionTask,
+                async () =>
+                {
+                    await action().ConfigureAwait(false);
+                    return await optionTask;
                 });
         }
     }

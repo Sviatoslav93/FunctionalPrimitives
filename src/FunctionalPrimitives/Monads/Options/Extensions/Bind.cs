@@ -1,6 +1,6 @@
 namespace FunctionalPrimitives.Monads.Options.Extensions;
 
-public static partial class MaybeExtensions
+public static partial class OptionExtensions
 {
     extension<T>(Option<T> option)
     {

@@ -1,8 +1,8 @@
 namespace FunctionalPrimitives.Monads.Options.Extensions;
 
-public static partial class MaybeExtensions
+public static partial class OptionExtensions
 {
-    extension<T>(Task<Option<T>> maybe)
+    extension<T>(Task<Option<T>> optionTask)
     {
         /// <summary>
         /// Asynchronously matches the state of the awaited <see cref="Option{T}"/> and executes
@@ -19,7 +19,36 @@ public static partial class MaybeExtensions
             Func<T, U> onSome,
             Func<U> onNone)
         {
-            return (await maybe.ConfigureAwait(false)).Match(onSome, onNone);
+            return (await optionTask.ConfigureAwait(false)).Match(onSome, onNone);
+        }
+
+        public async Task<U> MatchAsync<U>(
+            Func<T, Task<U>> onSome,
+            Func<U> onNone)
+        {
+            var maybe = await optionTask.ConfigureAwait(false);
+            return maybe.HasValue
+            ? await onSome(maybe.Value).ConfigureAwait(false)
+            : onNone();
+        }
+
+        public async Task<U> MatchAsync<U>(
+            Func<T, U> onSome,
+            Func<Task<U>> onNone)
+        {
+            var maybe = await optionTask.ConfigureAwait(false);
+            return maybe.HasValue
+            ? onSome(maybe.Value)
+            : await onNone().ConfigureAwait(false);
+        }
+        public async Task<U> MatchAsync<U>(
+                    Func<T, Task<U>> onSome,
+                    Func<Task<U>> onNone)
+        {
+            var maybe = await optionTask.ConfigureAwait(false);
+            return maybe.HasValue
+            ? await onSome(maybe.Value).ConfigureAwait(false)
+            : await onNone().ConfigureAwait(false);
         }
     }
 }

@@ -3,7 +3,7 @@ namespace FunctionalPrimitives.Monads.Options.Extensions;
 /// <summary>
 /// Extension methods for <see cref="Option{T}"/>.
 /// </summary>
-public static partial class MaybeExtensions
+public static partial class OptionExtensions
 {
     extension<T>(Option<T> option)
     {

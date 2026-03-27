@@ -3,7 +3,7 @@ using FunctionalPrimitives.Monads.Results;
 
 namespace FunctionalPrimitives.Monads.Options.Extensions;
 
-public static partial class MaybeExtensions
+public static partial class OptionExtensions
 {
     extension<T>(T? obj) where T : class
     {
@@ -50,17 +50,17 @@ public static partial class MaybeExtensions
         }
     }
 
-    extension<T>(Task<Option<T>> maybe)
+    extension<T>(Task<Option<T>> optionTask)
     {
         /// <summary>
         /// Asynchronously converts a <see cref="Task{TResult}"/> of <see cref="Option{T}"/> to a <see cref="Task{TResult}"/> of <see cref="Result{T}"/>.
-        /// The result is successful if the maybe has a value; otherwise it is a failed result with the specified error.
+        /// The result is successful if the option has a value; otherwise it is a failed result with the specified error.
         /// </summary>
         /// <param name="error">The error to use when no value is present.</param>
         /// <returns>
         /// A <see cref="Task{TResult}"/> that resolves to a successful <see cref="Result{T}"/> if a value is present;
         /// otherwise a failed result containing <paramref name="error"/>.
         /// </returns>
-        public Task<Result<T>> ToResultAsync(Error error) => maybe.MatchAsync(x => x, () => Failure<T>(error));
+        public Task<Result<T>> ToResultAsync(Error error) => optionTask.MatchAsync(x => x, () => Failure<T>(error));
     }
 }
