@@ -15,10 +15,10 @@
         <Version>1.0.0</Version>
         <Authors>Sviatoslav Kindrat</Authors>
         <PackageTags>Result, Error, Option, Functional</PackageTags>
-        <RepositoryUrl>https://github.com/Sviatoslav93/Result</RepositoryUrl>
+        <RepositoryUrl>https://github.com/Sviatoslav93/FunctionalPrimitives</RepositoryUrl>
         <PackageProjectUrl>https://github.com/Sviatoslav93/FunctionalPrimitives</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Description>The Result is an alternative to exception-based error handling.</Description>
+        <Description>Functional primitives for .NET</Description>
         <RepositoryType>git</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>

@@ -1,4 +1,5 @@
 using FunctionalPrimitives.Errors;
+using FunctionalPrimitives.Monads.Options;
 
 namespace FunctionalPrimitives.Monads.Results.Extensions;
 
@@ -17,6 +18,11 @@ public static partial class ResultExtensions
         where T : class
     {
         return value ?? Failure<T>(error);
+    }
+
+    public static Option<T> ToOption<T>(this Result<T> result)
+    {
+        return result.Match(Some, _ => None<T>());
     }
 
     /// <summary>
