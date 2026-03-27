@@ -18,12 +18,14 @@ jobs:
                   global-json-file: global.json
             - name: Restore dependencies
               run: dotnet restore
-            - name: Build
+            - name: Build Debug
+              run: dotnet build -c Debug --no-restore
+            - name: Build Release
               run: dotnet build -c Release --no-restore
             - name: Test Debug
-              run: dotnet test -c Debug --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+              run: dotnet test -c Debug --no-build --no-restore --verbosity normal --collect:"XPlat Code Coverage"
             - name: Test Release
-              run: dotnet test -c Release --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+              run: dotnet test -c Release --no-build --no-restore --verbosity normal --collect:"XPlat Code Coverage"
             - name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v4.0.1
               with:

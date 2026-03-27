@@ -10,9 +10,7 @@ public class CatalogItemsEndpoints : IEndpoints
     public void MapEndpoints(WebApplication app)
     {
         var group = app.MapGroup("/api/catalog-items")
-            .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status500InternalServerError);
+            ;
 
         SearchCatalogItemsEndpoint.Map(group);
         LookupCatalogItemEndpoint.Map(group);

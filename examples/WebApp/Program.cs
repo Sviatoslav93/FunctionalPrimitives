@@ -22,16 +22,17 @@ services.AddScoped<AuditableEntityInterceptor>();
 services.AddScoped<CatalogSeeder>();
 
 services.RegisterEndpointsFromAssemblyContaining<IApiMark>();
-services.AddOpenApi();
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     });
 }
 
