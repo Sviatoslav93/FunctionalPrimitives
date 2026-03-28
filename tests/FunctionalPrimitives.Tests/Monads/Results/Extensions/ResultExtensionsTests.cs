@@ -24,7 +24,7 @@ public partial class ResultExtensionsTests
     [Fact]
     public void ToResult_NullableClass_WithNonNull_ReturnsSuccess()
     {
-        string? value = "hello";
+        const string? value = "hello";
 
         var result = value.ToResult(new Error("was null"));
 
@@ -88,5 +88,25 @@ public partial class ResultExtensionsTests
 
         ignored.IsSuccess.ShouldBeFalse();
         ignored.Errors.ShouldContain(error);
+    }
+
+    [Fact]
+    public void ToOption_Success_ReturnsSome()
+    {
+        var result = Success("hello");
+
+        var option = result.ToOption();
+
+        option.HasValue.ShouldBeTrue();
+        option.Value.ShouldBe("hello");
+    }
+
+    [Fact]
+    public void ToOption_Failure_ReturnsNone()
+    {
+        var result = Failure<string>(new Error("failed"));
+        var option = result.ToOption();
+
+        option.HasValue.ShouldBeFalse();
     }
 }
